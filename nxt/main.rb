@@ -1,3 +1,9 @@
+#
+# $ sudo gem uninstall ruby-nxt -a
+# $ sudo gem install ruby-nxt
+#
+# http://ruby-nxt.rubyforge.org/classes/Commands.html
+
 require "rubygems"
 require 'nxt_comm'
 
