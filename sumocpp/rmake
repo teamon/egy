@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+require "optparse"
+
+LIBS = Dir["lib/*.cpp"]
+
+options = {}
+OptionParser.new do |o|
+  o.banner = "Usage: ./rmake [options] [name]"
+  o.on("-p", "Program flash") {|v| options[:program] = v }
+  o.on("-m", "Make") {|v| options[:make] = v }
+  o.on("-r", "Remove .elf, .hex, .o") {|v| options[:remove] = v}
+  o.on("-V", "Do not verify") {|v| options[:verify] = v}
+end.parse!
+
+options[:program] = options[:make] = options[:verify] = true if options.empty?
+
+if options[:remove]
+  print "Removing..."
+  ["elf", "hex", "o"].each do |ext| 
+    Dir["**/*.#{ext}"].each do |f| 
+      print f + " "
+      File.delete(f)
+    end
+  end
+  puts "done."
+end
+
+progname = ARGV.first
+
+makefile_libs = LIBS.map do |name|
+  name = name.split('.').first
+  "#{name}.o: #{name}.cpp lib/sumo.h
+	$(CC) $(ARGS) -c #{name}.cpp -o $@"
+end.join("\n\n")
+
+makefile = <<-MAKEFILE
+PROGNAME=#{progname}
+CC=avr-g++
+MMCU=atmega32
+OPT= -O2
+ARGS=$(OPT) -mmcu=$(MMCU)
+HEX=$(PROGNAME).hex
+
+all: $(HEX)
+
+$(HEX): $(PROGNAME).elf
+	avr-objcopy -O ihex $^ $@
+	
+$(PROGNAME).elf: $(PROGNAME).o #{LIBS.join(" ")}
+	$(CC) $(ARGS) $^ -o $@	
+	
+$(PROGNAME).o: $(PROGNAME).cpp
+	$(CC) $(ARGS) -c $(PROGNAME).cpp -o $@
+	
+#{makefile_libs}
+	
+clean:
+	rm -f *.o
+	rm -f sumolib/*.o
+	rm -f $(PROGNAME).elf
+
+MAKEFILE
+
+if options[:make]
+  File.open('Makefile', 'w') do |f|
+    f.puts makefile
+  end
+  make_output = `make 2>&1`
+  puts make_output
+end
+
+if make_output and make_output.downcase =~ /error/
+  puts "ERROR"
+elsif options[:program]
+  com = "avrdude #{options[:verify] ? '-V ' : ''}-c stk500v2 -P avrdoper -p atmega32 -U flash:w:#{progname}.hex"
+  puts com
+  puts `#{com}`
+end
+

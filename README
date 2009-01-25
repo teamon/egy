@@ -1,2 +1,5 @@
 egy sumobot
 
+
+$ ./rmake --help
+$ ./rmake -mp main
