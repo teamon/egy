@@ -5,15 +5,17 @@ class Motor
 {
 public:
   Motor(){}
-  Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin, unsigned char max);
+  Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin);
   void set_power(char power);
   void stop();
 
 private:
-  unsigned int max_power;
   volatile uint16_t* REG;
   volatile uint8_t* DIR_PORT;
   unsigned char DIR_PIN;
 };
+
+extern Motor motor_left;
+extern Motor motor_right;
 
 #endif

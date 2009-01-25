@@ -1,8 +1,10 @@
 #include "sumo.h"
 #include "motor.h"
 
-Motor::Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin, unsigned char max){
-  max_power = max;
+Motor motor_left;
+Motor motor_right;
+  
+Motor::Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin){
   REG = reg;
   DIR_PORT = port;
   DIR_PIN = pin;
@@ -13,9 +15,9 @@ void Motor::stop(){
 }
 
 void Motor::set_power(char p){
-  char dir = p/abs(p); // a moze samo dir = p ?
+  char dir = p; /// albo p/abs(p);
   p = abs(p);
-  if(p > max_power) p = max_power;
+  if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;
   *REG = p * 10;
   
   if(dir > 0) clr(*DIR_PORT, DIR_PIN); // do przodu
@@ -40,6 +42,8 @@ void motor_init() {
   
   clr(MOTOR1_DIR_PORT, MOTOR1_DIR_PIN);
   clr(MOTOR2_DIR_PORT, MOTOR2_DIR_PIN);
-  
+
+  motor_left = Motor(&OCR1A, &MOTOR1_DIR_PORT, MOTOR1_DIR_PIN);
+  motor_right = Motor(&OCR1B, &MOTOR2_DIR_PORT, MOTOR2_DIR_PIN);
 }
 

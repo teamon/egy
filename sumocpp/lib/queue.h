@@ -4,7 +4,7 @@
 class Move
 {
   public:
-  int m1, m2, time;
+  int left, right, time;
 };
 
 class Queue

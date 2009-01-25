@@ -26,11 +26,11 @@ void Queue::push(Move move)
   tail = curr;
 }
 
-void Queue::push(char m1, char m2, int time)
+void Queue::push(char left, char right, int time)
 {
   Move m;
-  m.m1 = m1;
-  m.m2 = m2;
+  m.left = left;
+  m.right = right;
   m.time = time;
   push(m);
 }
