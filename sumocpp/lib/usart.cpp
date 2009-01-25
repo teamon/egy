@@ -44,61 +44,65 @@ void usart_write_progmem_string(const char *string) {
 // Wysłanie liczby na RS
 void usart_write_number(long number)
 {
-  unsigned char i,j,k;
-  long a,b;
-  a=1000000000;
-  b=999999999;
+  char *c;
+  itoa(number, c, 10000); // nie wiem co to ten ostatni parametr trzeba sprawdzic czy to dziala
+  usart_write_string(c);
   
-  // wysłanie znaku '-'
-  if (number < 0)
-    usart_write_byte('-');
-  
-  for (i=0;i<10;i++)
-  {
-    j = (number / a) % 10;
-    if ((number > b) || (i == 9)) 
-    {
-      // zamiana na znak
-      switch(j)
-      {
-        case 0:
-          k='0';
-          break;  
-        case 1:
-          k='1';
-          break;
-        case 2:
-          k='2';
-          break;
-        case 3:
-          k='3';
-          break; 
-        case 4:
-          k='4';
-          break;  
-        case 5:
-          k='5';
-          break;
-        case 6:
-          k='6';
-          break;
-        case 7:
-          k='7';
-          break; 
-        case 8:
-          k='8';
-          break;  
-        case 9:
-          k='9';
-          break;
-        default:
-          k='0';
-      }
-      usart_write_byte(k);
-    }
-    a /= 10;
-    b /= 10;
-  }
+  // unsigned char i,j,k;
+  //   long a,b;
+  //   a=1000000000;
+  //   b=999999999;
+  //   
+  //   // wysłanie znaku '-'
+  //   if (number < 0)
+  //     usart_write_byte('-');
+  //   
+  //   for (i=0;i<10;i++)
+  //   {
+  //     j = (number / a) % 10;
+  //     if ((number > b) || (i == 9)) 
+  //     {
+  //       // zamiana na znak
+  //       switch(j)
+  //       {
+  //         case 0:
+  //           k='0';
+  //           break;  
+  //         case 1:
+  //           k='1';
+  //           break;
+  //         case 2:
+  //           k='2';
+  //           break;
+  //         case 3:
+  //           k='3';
+  //           break; 
+  //         case 4:
+  //           k='4';
+  //           break;  
+  //         case 5:
+  //           k='5';
+  //           break;
+  //         case 6:
+  //           k='6';
+  //           break;
+  //         case 7:
+  //           k='7';
+  //           break; 
+  //         case 8:
+  //           k='8';
+  //           break;  
+  //         case 9:
+  //           k='9';
+  //           break;
+  //         default:
+  //           k='0';
+  //       }
+  //       usart_write_byte(k);
+  //     }
+  //     a /= 10;
+  //     b /= 10;
+  //   }
 }
 
 // Odbieranie bajtu z ES

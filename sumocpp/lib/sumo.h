@@ -200,7 +200,6 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
-#include <avr/wdt.h>
 #include <util/delay.h>
 #include <ctype.h>
 #include <stdlib.h>
