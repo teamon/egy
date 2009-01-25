@@ -129,8 +129,8 @@ int main() {
       motor_right.set_power(move.right);
     } else {
       // serczin` und killin` !
-      // motor.left.set_power(0);
-      // motor.right.set_power(0);
+      motor_left.set_power(0);
+      motor_right.set_power(0);
     }
     
     wait_ms(ITIME);
