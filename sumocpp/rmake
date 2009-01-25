@@ -9,7 +9,7 @@ OptionParser.new do |o|
   o.on("-p", "Program flash") {|v| options[:program] = v }
   o.on("-m", "Make") {|v| options[:make] = v }
   o.on("-r", "Remove .elf, .hex, .o") {|v| options[:remove] = v}
-  o.on("-V", "Do not verify") {|v| options[:verify] = v}
+  o.on("-v", "Verify") {|v| options[:verify] = v}
 end.parse!
 
 options[:program] = options[:make] = options[:verify] = true if options.empty?
@@ -72,7 +72,7 @@ end
 if make_output and make_output.downcase =~ /error/
   puts "ERROR"
 elsif options[:program]
-  com = "avrdude #{options[:verify] ? '-V ' : ''}-c stk500v2 -P avrdoper -p atmega32 -U flash:w:#{progname}.hex"
+  com = "avrdude #{options[:verify] ? '' : '-V'} -c stk500v2 -P avrdoper -p atmega32 -U flash:w:#{progname}.hex"
   puts com
   puts `#{com}`
 end

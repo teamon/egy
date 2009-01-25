@@ -26,13 +26,20 @@ Move move;
 Motor motor1;
 Motor motor2;
 
+void reset() 
+{
+  asm("cli"); 
+  asm("jmp 0"); 
+}
+
 // debug itp
 unsigned char progressVal = 1;
 void progress(){  
   led_send(progressVal);
-  if (progressVal*2 > 63) progressVal = 1;
+  if (progressVal == 128) progressVal = 1;
   else progressVal *= 2;
 }
+// 1 2 4 8 12 32 64 128
 
 void send_ground_state_on_usart(){
   usart_write_progmem_string(PSTR("2:1:"));
@@ -105,13 +112,15 @@ int main() {
   init();
   leds_on();
   
-  wait_s(5); // regulaminowy czas
-
+  if(!DEBUG) wait_s(5); // regulaminowy czas
+  
   for(;;){
     if(DEBUG) debug();
         
     if(switch1_pressed()){
       leds_negate();
+      wait_ms(1000);
+      reset();
     }
     
     if(queue.head){
@@ -119,8 +128,9 @@ int main() {
       motor1.set_power(move.m1);
       motor2.set_power(move.m2);
     } else {
-      leds_off();
+      // leds_off();
       // szukanie
+      
       motor1.set_power(0);
       motor2.set_power(0);
     }
