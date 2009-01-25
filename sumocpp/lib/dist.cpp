@@ -1,10 +1,8 @@
 #include "sumo.h"
 
 // Numer aktualnie przetwarzanego portu
-volatile unsigned char dist_p = 1;
-volatile unsigned char tmp;
-
-volatile unsigned char values[7];
+volatile unsigned char dist_p = 0;
+volatile unsigned char values[6];
 
 // Funkcja inicjalizująca czujniki odległości
 // UWAGA: zajmuje przetwornik AC
@@ -31,12 +29,11 @@ unsigned char dist(char id){
 SIGNAL (SIG_ADC)
 {
   values[dist_p] = ADCH;
-  tmp = dist_p;
-  if (tmp == 6) tmp = 0;
-  ADMUX = 0x60 + tmp;
+  if (dist_p == 5) ADMUX = 0x60;
+  else ADMUX = 0x60 + (dist_p + 1);
     
   dist_p++;
-  if (dist_p > 6) dist_p = 1;
+  if (dist_p > 5) dist_p = 0;
   
   ADCSRA |= 0x40;
 }

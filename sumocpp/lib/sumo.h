@@ -235,12 +235,6 @@ unsigned char ground4_detected();
 
 // lib/dist.cpp
 void dist_init();
-unsigned char dist1_value();
-unsigned char dist2_value();
-unsigned char dist3_value();
-unsigned char dist4_value();
-unsigned char dist5_value();
-unsigned char dist6_value();
 
 // lib/servo.cpp
 void servo_init();
