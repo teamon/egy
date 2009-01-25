@@ -255,8 +255,8 @@ void servo2_calibrate();
 void usart_init();
 void usart_write_byte(unsigned char byte);
 void usart_write_string(char *string);
-void usart_write_string_from_progmem(const char *string);
 void usart_write_number(long number);
+void usart_write_progmem_string(const char *string);
 unsigned char usart_read_byte();
 
 #endif

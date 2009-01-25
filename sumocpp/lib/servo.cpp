@@ -77,7 +77,7 @@ SIGNAL (SIG_OVERFLOW0)
     if(servo2 > 0) clr(SERVO2_PORT,SERVO2_PIN);
   }
 
-   counter++;
-   if (counter==40) counter=0;
+  counter++;
+  if (counter==40) counter=0;
 }
 
