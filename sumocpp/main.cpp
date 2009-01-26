@@ -39,10 +39,10 @@ void progress(){
 // 1 2 4 8 12 32 64 128
 
 void send_ground_state_on_usart(){
-  // usart_write_progmem_string(PSTR("2:1:"));
-  // if (ground1_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
+  usart_write_progmem_string(PSTR("2:1:"));
+  if (ground1_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
   // 
   // usart_write_progmem_string(PSTR("2:2:"));
   // if (ground2_detected()) usart_write_byte('2');
@@ -61,35 +61,36 @@ void send_ground_state_on_usart(){
 }
 
 void send_distance_state_on_usart() {
-  // usart_write_progmem_string(PSTR("4:1:"));
-  // usart_write_number((int)dist1_value());
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:2:"));
-  // usart_write_number((int)dist2_value());
-  // usart_write_byte('\n');
-  // 
+  leds_negate();
+  usart_write_progmem_string(PSTR("4:1:"));
+  usart_write_number((int)dist(0));
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("4:2:"));
+  usart_write_number((int)dist(1));
+  usart_write_byte('\n');
+  
   // usart_write_progmem_string(PSTR("4:3:"));
-  // usart_write_number((int)dist3_value());
+  // usart_write_number((int)dist(2));
   // usart_write_byte('\n');
   // 
   // usart_write_progmem_string(PSTR("4:4:"));
-  // usart_write_number((int)dist4_value());
+  // usart_write_number((int)dist(3));
   // usart_write_byte('\n');
   // 
   // usart_write_progmem_string(PSTR("4:5:"));
-  // usart_write_number((int)dist5_value());
+  // usart_write_number((int)dist(4));
   // usart_write_byte('\n');
   // 
   // usart_write_progmem_string(PSTR("4:6:"));
-  // usart_write_number((int)dist6_value());
+  // usart_write_number((int)dist(5));
   // usart_write_byte('\n');
 }
 
 void debug(){
   progress();
   send_ground_state_on_usart();
-	send_distance_state_on_usart();
+  send_distance_state_on_usart();
 }
 
 void reverse(){
@@ -111,28 +112,38 @@ void init(){
 int main() {
   init();
   leds_on();
-
+  
   if(!DEBUG) wait_s(5); // regulaminowy czas
+  
+  for (;;){
+    if (usart_read_byte() == '!'){
+      usart_write_progmem_string(PSTR("Bonjour\n"));
+      break;
+    }
+  
+    wait_ms(ITIME);
+  }
   
   for(;;){
     if(DEBUG) debug();
+    if (usart_read_byte() == '!') reset();
         
-    if(switch1_pressed()){
-      leds_negate();
-      wait_ms(1000);
-      reset();
-    }
+    // if(switch1_pressed()){
+    //   leds_negate();
+    //   wait_ms(1000);
+    //   reset();
+    // }
     
-    if(queue.head){
-      move = queue.pop(ITIME);
-      motor_left.set_power(move.left);
-      motor_right.set_power(move.right);
-    } else {
-      // serczin` und killin` !
-      motor_left.set_power(0);
-      motor_right.set_power(0);
-    }
-    
+    // if(queue.head){
+    //   move = queue.pop(ITIME);
+    //   motor_left.set_power(move.left);
+    //   motor_right.set_power(move.right);
+    // } else {
+    //   // serczin` und killin` !
+    //   motor_left.set_power(0);
+    //   motor_right.set_power(0);
+    // }
+    // 
     wait_ms(ITIME);
   }
 }
