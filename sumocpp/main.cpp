@@ -29,62 +29,44 @@ void reset()
   asm("jmp 0"); 
 }
 
-// debug itp
-unsigned char progressVal = 1;
-void progress(){  
-  led_send(progressVal);
-  if (progressVal == 128) progressVal = 1;
-  else progressVal *= 2;
+// debug itp progress powinien dzialac
+unsigned char progressVal = 0;
+void progress(){
+  if (progressVal == 8) progressVal = 0;
+  else progressVal++;
+  led_set(1 << progressVal);
 }
-// 1 2 4 8 12 32 64 128
 
 void send_ground_state_on_usart(){
   usart_write_progmem_string(PSTR("2:1:"));
   if (ground1_detected()) usart_write_byte('2');
   else usart_write_byte('1');
   usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:2:"));
-  // if (ground2_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:3:"));
-  // if (ground3_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:4:"));
-  // if (ground4_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:2:"));
+  if (ground2_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:3:"));
+  if (ground3_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:4:"));
+  if (ground4_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
 }
 
 void send_distance_state_on_usart() {
-  leds_negate();
-  usart_write_progmem_string(PSTR("4:1:"));
-  usart_write_number((int)dist(0));
-  usart_write_byte('\n');
-  
-  usart_write_progmem_string(PSTR("4:2:"));
-  usart_write_number((int)dist(1));
-  usart_write_byte('\n');
-  
-  // usart_write_progmem_string(PSTR("4:3:"));
-  // usart_write_number((int)dist(2));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:4:"));
-  // usart_write_number((int)dist(3));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:5:"));
-  // usart_write_number((int)dist(4));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:6:"));
-  // usart_write_number((int)dist(5));
-  // usart_write_byte('\n');
+  for(char i=0 ; i<8 ; ++i){
+    usart_write_progmem_string(PSTR("4:"));
+    usart_write_number(i);
+    usart_write_progmem_string(PSTR(":"));
+    usart_write_number((int)dist(0));
+    usart_write_byte('\n');
+  }
 }
 
 void debug(){
@@ -111,7 +93,7 @@ void init(){
 
 int main() {
   init();
-  leds_on();
+  led8_on();
   
   if(!DEBUG) wait_s(5); // regulaminowy czas
   

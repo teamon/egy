@@ -18,7 +18,7 @@ void led_init() {
 }
 
 // Wysylanie danych do sterownika
-void sled_send() {
+void led_send() {
   // sprawdzanie czy cos sie zmienilo
   if (led_state != last_led_state) {
     int i;
@@ -36,7 +36,7 @@ void sled_send() {
       // zbocze rosnace zegara
       setb(LED_CLK_PORT,LED_CLK_PIN);
       // opoznienie
-      sled_delay();
+      led_delay();
       // zbocze opadajace zegara
       clr(LED_CLK_PORT,LED_CLK_PIN);
       // przesuniecie
@@ -44,12 +44,12 @@ void sled_send() {
     }
 
     // opoznienie
-    sled_delay();
+    led_delay();
     // zbocze opadajace zatrzasku
     //clr(LED_LE_PORT,LED_LE_PIN);
     setb(LED_LE_PORT,LED_LE_PIN);
     // opoznienie
-    sled_delay();
+    led_delay();
     // zbocze rosnace zatrzasku
     //setb(LED_LE_PORT,LED_LE_PIN);
     clr(LED_LE_PORT,LED_LE_PIN);
@@ -59,13 +59,13 @@ void sled_send() {
 }
 
 // Funkcja ustawia wartosci diod
-void sled_set(unsigned int value) {
+void led_set(unsigned int value) {
   led_state = value;
   led_state = led_state << 8;
   led_send();
 }
 
-void sled_delay() {
+void led_delay() {
   volatile unsigned char i;
   for (i=0; i<10; i++);
 }
