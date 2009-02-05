@@ -10,6 +10,8 @@ void ground_init() {
   clr(GROUND_PORT, GROUND2_PIN);
   clr(GROUND_PORT, GROUND3_PIN);
   clr(GROUND_PORT, GROUND4_PIN);
+	setb(GROUND_PWM_DDR, GROUND_PWM);
+	setb(GROUND_PWN_PORT, GROUND_PWM);
 }
 
 unsigned char ground(){

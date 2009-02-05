@@ -18,7 +18,7 @@
  *   1 - GROUND2 - czujnik podłoża
  *   2 - GROUND3 - czujnik podłoża
  *   3 - GROUND4 - czujnik podłoża
- *   4 - SLED_LE - wyjscie sterownika diod
+ *   4 - LED_LE - wyjscie sterownika diod
  *   5 - MOSI - używany do programowania
  *   6 - MISO - używany do programowania
  *   7 - SCK - używany do programowania
@@ -30,8 +30,8 @@
  *   3 - SERVO2 - wyjśćie serwomechanizmu
  *   4 - SERVO3 - wyjśćie serwomechanizmu
  *   5 - SERVO4 - wyjśćie serwomechanizmu
- *   6 - SLED_CLK - wyjśćie sterownika diod
- *   7 - SLED_SDI - wyjśćie sterownika diod
+ *   6 - LED_CLK - wyjśćie sterownika diod
+ *   7 - LED_SDI - wyjśćie sterownika diod
  *  
  * PORTD
  *   0 - RXD - port szeregowy
@@ -166,23 +166,23 @@
 
 
 // Port danych sterownika diod LED
-#define SLED_SDI_PORT PORTC
+#define LED_SDI_PORT PORTC
 // Rejestr kierunku portu danych sterownika diod LED
-#define SLED_SDI_DDR DDRC
+#define LED_SDI_DDR DDRC
 // Linia portu danych sterownika diod LED
-#define SLED_SDI_PIN 7
+#define LED_SDI_PIN 7
 // Port danych sterownika diod LED
-#define SLED_CLK_PORT PORTC
+#define LED_CLK_PORT PORTC
 // Rejestr kierunku portu danych sterownika diod LED
-#define SLED_CLK_DDR DDRC
+#define LED_CLK_DDR DDRC
 // Linia portu danych sterownika diod LED
-#define SLED_CLK_PIN 6
+#define LED_CLK_PIN 6
 // Port zatrzasku sterownika diod LED
-#define SLED_LE_PORT PORTB
+#define LED_LE_PORT PORTB
 // Rejestr kierunku portu zatrzasku sterownika diod LED
-#define SLED_LE_DDR DDRB
+#define LED_LE_DDR DDRB
 // Linia portu zatrzasku sterownika diod LED
-#define SLED_LE_PIN 4
+#define LED_LE_PIN 4
 
 
 // Wartość preskalera timera0
