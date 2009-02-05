@@ -27,14 +27,14 @@ void servo_init() {
   sei();
   
   // Konfiguracja portów
-	setb(SERVO1_DDR, SERVO1_PIN);
-	setb(SERVO2_DDR, SERVO2_PIN);
-	setb(SERVO3_DDR, SERVO3_PIN);
-	setb(SERVO4_DDR, SERVO4_PIN);
-	clr(SERVO1_PORT, SERVO1_PIN);
-	clr(SERVO2_PORT, SERVO2_PIN);
-	clr(SERVO3_PORT, SERVO3_PIN);
-	clr(SERVO4_PORT, SERVO4_PIN);
+  setb(SERVO1_DDR, SERVO1_PIN);
+  setb(SERVO2_DDR, SERVO2_PIN);
+  setb(SERVO3_DDR, SERVO3_PIN);
+  setb(SERVO4_DDR, SERVO4_PIN);
+  clr(SERVO1_PORT, SERVO1_PIN);
+  clr(SERVO2_PORT, SERVO2_PIN);
+  clr(SERVO3_PORT, SERVO3_PIN);
+  clr(SERVO4_PORT, SERVO4_PIN);
   
   // logiczne włączenie serw
   servo1 = 1;
