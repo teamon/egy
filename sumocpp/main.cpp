@@ -43,25 +43,27 @@ void send_ground_state_on_usart(){
   if (ground1_detected()) usart_write_byte('2');
   else usart_write_byte('1');
   usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:2:"));
-  // if (ground2_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:3:"));
-  // if (ground3_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("2:4:"));
-  // if (ground4_detected()) usart_write_byte('2');
-  // else usart_write_byte('1');
-  // usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:2:"));
+  if (ground2_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:3:"));
+  if (ground3_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("2:4:"));
+  if (ground4_detected()) usart_write_byte('2');
+  else usart_write_byte('1');
+  usart_write_byte('\n');
 }
 
 void send_distance_state_on_usart() {
-  leds_negate();
+  if(dist(0) < 115) leds_on();
+  else leds_off();
+  // leds_negate();
   usart_write_progmem_string(PSTR("4:1:"));
   usart_write_number((int)dist(0));
   usart_write_byte('\n');
@@ -70,21 +72,21 @@ void send_distance_state_on_usart() {
   usart_write_number((int)dist(1));
   usart_write_byte('\n');
   
-  // usart_write_progmem_string(PSTR("4:3:"));
-  // usart_write_number((int)dist(2));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:4:"));
-  // usart_write_number((int)dist(3));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:5:"));
-  // usart_write_number((int)dist(4));
-  // usart_write_byte('\n');
-  // 
-  // usart_write_progmem_string(PSTR("4:6:"));
-  // usart_write_number((int)dist(5));
-  // usart_write_byte('\n');
+  usart_write_progmem_string(PSTR("4:3:"));
+  usart_write_number((int)dist(2));
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("4:4:"));
+  usart_write_number((int)dist(3));
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("4:5:"));
+  usart_write_number((int)dist(4));
+  usart_write_byte('\n');
+  
+  usart_write_progmem_string(PSTR("4:6:"));
+  usart_write_number((int)dist(5));
+  usart_write_byte('\n');
 }
 
 void debug(){
@@ -117,7 +119,7 @@ int main() {
   
   for (;;){
     if (usart_read_byte() == '!'){
-      usart_write_progmem_string(PSTR("Bonjour\n"));
+      //usart_write_progmem_string(PSTR("Bonjour\n"));
       break;
     }
   
@@ -126,7 +128,7 @@ int main() {
   
   for(;;){
     if(DEBUG) debug();
-    if (usart_read_byte() == '!') reset();
+    if (usart_read_byte() == '*') reset();
         
     // if(switch1_pressed()){
     //   leds_negate();

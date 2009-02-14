@@ -1,12 +1,14 @@
 require "serialport"
 
+
 begin
-  sp = SerialPort.new "/dev/tty.usbserial", 9600
-  sp.putc "!"
+  sp = SerialPort.new "/dev/cu.usbserial", 9600
+  # sp.clear
+  # sp.putc "!"
   while c = sp.gets
-    puts c
+    print c
   end
 rescue Interrupt => e
-  sp.putc "!"
+  # sp.putc "!"
   sp.close
 end
