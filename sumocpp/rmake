@@ -37,7 +37,7 @@ makefile = <<-MAKEFILE
 PROGNAME=#{progname}
 CC=avr-g++
 MMCU=atmega32
-OPT= -O2
+OPT= -O2 -w
 ARGS=$(OPT) -mmcu=$(MMCU)
 HEX=$(PROGNAME).hex
 
