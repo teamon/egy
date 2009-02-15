@@ -23,7 +23,8 @@
 Queue queue;
 Move move;
 
-void reset(){
+void reset() 
+{
   asm("cli"); 
   asm("jmp 0"); 
 }
@@ -31,6 +32,7 @@ void reset(){
 // debug itp
 unsigned char progressVal = 1;
 void progress(){  
+  led1_on();
   led_send(progressVal);
   if (progressVal == 128) progressVal = 1;
   else progressVal *= 2;
@@ -60,8 +62,6 @@ void send_ground_state_on_usart(){
 }
 
 void send_distance_state_on_usart() {
-  if(dist(0) < 115) leds_on();
-  else leds_off();
   // leds_negate();
   usart_write_progmem_string(PSTR("4:1:"));
   usart_write_number((int)dist(0));
@@ -90,8 +90,8 @@ void send_distance_state_on_usart() {
 
 void debug(){
   progress();
-  // send_ground_state_on_usart();
-  // send_distance_state_on_usart();
+  send_ground_state_on_usart();
+  send_distance_state_on_usart();
 }
 
 void reverse(){
@@ -113,17 +113,14 @@ void init(){
 int main() {
   init();
   leds_on();
-    
-  led1_on();
-  wait_s(2);
-  led2_on();
-    
+  
+  if(!DEBUG) wait_s(5); // regulaminowy czas
+  
   for (;;){
-    led1_negate();
-    // if (usart_read_byte() == '!'){
-    //   // usart_write_progmem_string(PSTR("Offblast3\n"));
-    //   break;
-    // }
+    if (usart_read_byte() == '!'){
+      usart_write_progmem_string(PSTR("Bonjour\n"));
+      break;
+    }
   
     wait_ms(ITIME);
   }
