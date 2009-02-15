@@ -1,13 +1,12 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-struct Move {
+struct Move{
 	char left, right, pri;
 	int time;
 };
 
-class Queue
-{
+class Queue{
 public:	 
 	Queue();
 	~Queue();

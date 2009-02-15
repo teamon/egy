@@ -3,33 +3,33 @@ require "optparse"
 
 LIBS = Dir["lib/*.cpp"]
 
-options = {}
+options ={}
 OptionParser.new do |o|
-  o.banner = "Usage: ./rmake [options] [name]"
-  o.on("-p", "Program flash") {|v| options[:program] = v }
-  o.on("-m", "Make") {|v| options[:make] = v }
-  o.on("-r", "Remove .elf, .hex, .o") {|v| options[:remove] = v}
-  o.on("-v", "Verify") {|v| options[:verify] = v}
+	o.banner = "Usage: ./rmake [options] [name]"
+	o.on("-p", "Program flash"){|v| options[:program] = v }
+	o.on("-m", "Make"){|v| options[:make] = v }
+	o.on("-r", "Remove .elf, .hex, .o"){|v| options[:remove] = v}
+	o.on("-v", "Verify"){|v| options[:verify] = v}
 end.parse!
 
 options[:program] = options[:make] = options[:verify] = true if options.empty?
 
 if options[:remove]
-  print "Removing..."
-  ["elf", "hex", "o"].each do |ext| 
-    Dir["**/*.#{ext}"].each do |f| 
-      print f + " "
-      File.delete(f)
-    end
-  end
-  puts "done."
+	print "Removing..."
+	["elf", "hex", "o"].each do |ext| 
+		Dir["**/*.#{ext}"].each do |f| 
+			print f + " "
+			File.delete(f)
+		end
+	end
+	puts "done."
 end
 
 progname = ARGV.first.tr('.cpp', '')
 
 makefile_libs = LIBS.map do |name|
-  name = name.split('.').first
-  "#{name}.o: #{name}.cpp lib/sumo.h
+	name = name.split('.').first
+	"#{name}.o: #{name}.cpp lib/sumo.h
 	$(CC) $(ARGS) -c #{name}.cpp -o $@"
 end.join("\n\n")
 
@@ -62,18 +62,18 @@ clean:
 MAKEFILE
 
 if options[:make]
-  File.open('Makefile', 'w') do |f|
-    f.puts makefile
-  end
-  make_output = `make 2>&1`
-  puts make_output
+	File.open('Makefile', 'w') do |f|
+		f.puts makefile
+	end
+	make_output = `make 2>&1`
+	puts make_output
 end
 
 if make_output and make_output.downcase =~ /error/
-  puts "ERROR"
+	puts "ERROR"
 elsif options[:program]
-  com = "avrdude #{options[:verify] ? '' : '-V'} -c stk500v2 -P avrdoper -p atmega32 -U flash:w:#{progname}.hex"
-  puts com
-  puts `#{com}`
+	com = "avrdude #{options[:verify] ? '' : '-V'} -c stk500v2 -P avrdoper -p atmega32 -U flash:w:#{progname}.hex"
+	puts com
+	puts `#{com}`
 end
 

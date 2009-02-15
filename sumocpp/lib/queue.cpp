@@ -1,7 +1,7 @@
 #include "sumo.h"
 #include "queue.h"
 
-struct Item {
+struct Item{
 	Move move;
 	Item* next;
 } *head, *tail;
@@ -10,15 +10,15 @@ Queue::Queue(){
 	head = tail = NULL;
 }
 
-Queue::~Queue() {
+Queue::~Queue(){
 	clear();
 }
 
-void Queue::clear() {
+void Queue::clear(){
 	while(head) pop();
 }
 
-void Queue::push(Move move) {
+void Queue::push(Move move){
 	Item* curr = (Item*) malloc(sizeof(Item));
 	if(head == NULL) head = curr;
 	else tail->next = curr;
@@ -27,7 +27,7 @@ void Queue::push(Move move) {
 	tail = curr;
 }
 
-void Queue::push(char left, char right, int time) {
+void Queue::push(char left, char right, int time){
 	Move m;
 	m.left = left;
 	m.right = right;
@@ -36,7 +36,7 @@ void Queue::push(char left, char right, int time) {
 	push(m);
 }
 
-void Queue::push(char left, char right, int time, int priority) {
+void Queue::push(char left, char right, int time, int priority){
 	Move m;
 	m.left = left;
 	m.right = right;
@@ -52,7 +52,7 @@ Move* Queue::front(){
 }
 
 Move Queue::dec(int time){
-  if(head){
+	if(head){
 		head->move.time -= time;
 		if(head->move.time <= 0){
 			return pop();
