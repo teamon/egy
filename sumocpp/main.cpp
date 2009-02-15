@@ -23,8 +23,7 @@
 Queue queue;
 Move move;
 
-void reset() 
-{
+void reset(){
   asm("cli"); 
   asm("jmp 0"); 
 }
@@ -91,8 +90,8 @@ void send_distance_state_on_usart() {
 
 void debug(){
   progress();
-  send_ground_state_on_usart();
-  send_distance_state_on_usart();
+  // send_ground_state_on_usart();
+  // send_distance_state_on_usart();
 }
 
 void reverse(){
@@ -114,14 +113,17 @@ void init(){
 int main() {
   init();
   leds_on();
-  
-  if(!DEBUG) wait_s(5); // regulaminowy czas
-  
+    
+  led1_on();
+  wait_s(2);
+  led2_on();
+    
   for (;;){
-    if (usart_read_byte() == '!'){
-      //usart_write_progmem_string(PSTR("Bonjour\n"));
-      break;
-    }
+    led1_negate();
+    // if (usart_read_byte() == '!'){
+    //   // usart_write_progmem_string(PSTR("Offblast3\n"));
+    //   break;
+    // }
   
     wait_ms(ITIME);
   }
