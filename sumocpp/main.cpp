@@ -26,6 +26,19 @@ Queue queue;
 //Motor motor[2];
 bool mleft = 0, mright = 1;
 
+int Dist[6];
+double p[6];
+void kalmanize(){
+	for(int k=0; k < 6; k++) {
+		int i = dist(k);
+		
+		double P_ = p[k] + KQ;
+		double K = P_/(P_+KR);
+		Dist[k] = Dist[k]+K*(i-Dist[k]);
+		p[k] = (1 - K)*P_;
+	}
+}
+
 void reverse(){
 	//motory
 	mleft = !mleft;
