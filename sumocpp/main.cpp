@@ -23,18 +23,21 @@
 Queue queue;
 //Move move;
 
-void reset(){
-	asm("cli"); 
-	asm("jmp 0"); 
-}
+//Motor motor[2];
+bool mleft = 0, mright = 1;
 
 void reverse(){
-	Motor tmp = motor_left;
-	motor_left = motor_right;
-	motor_right = tmp;
+	//motory
+	mleft = !mleft;
+	mright = !mright;
+	
+	//disty
+	
+	//groundy
+	
 }
 
-void init(){
+void setup(){
 	led_init();
 	motor_init();
 	switch_init();
@@ -42,43 +45,62 @@ void init(){
 	dist_init();
 	servo_init();
 	if(DEBUG) usart_init();
+	
+	leds_on();
+}
+
+unsigned char ticks = 0;
+bool odliczanie = false;
+bool hold = false;
+bool preLoop(){
+	if (DEBUG){
+		if (usart_read_byte() == '!'){
+			usart_write_progmem_string(PSTR("Bonjour\n"));
+			return true;
+		}
+	}else {
+		if (switch1_pressed() && !hold){
+			odliczanie = !odliczanie;
+			ticks = 0;
+			hold = true;
+		}else if(!switch1_pressed())
+			hold = false;
+		
+		ticks += odliczanie;
+		if (ticks >= 5000/ITIME) return true;
+	}
+	return false;
+}
+
+void loop(){
+	if(DEBUG) debug();
+	if (usart_read_byte() == '*') reset();
+			
+	// if(switch1_pressed()){
+	//	 leds_negate();
+	//	 wait_ms(1000);
+	//	 reset();
+	// }
+	
+	// if(queue.head){
+	//	 move = queue.pop(ITIME);
+	//	 motor_left.set_power(move.left);
+	//	 motor_right.set_power(move.right);
+	// } else{
+	//	 // serczin` und killin` !
+	//	 motor_left.set_power(0);
+	//	 motor_right.set_power(0);
+	// }
+	//
 }
 
 int main(){
-	init();
-	leds_on();
+	setup();
 	
-	if(!DEBUG) wait_s(5); // regulaminowy czas
-	
-	for (;;){
-		if (usart_read_byte() == '!'){
-			usart_write_progmem_string(PSTR("Bonjour\n"));
-			break;
-		}
-	
-		wait_ms(ITIME);
-	}
+	while(!preLoop()) wait_ms(ITIME);
 	
 	for(;;){
-		if(DEBUG) debug();
-		if (usart_read_byte() == '*') reset();
-				
-		// if(switch1_pressed()){
-		//	 leds_negate();
-		//	 wait_ms(1000);
-		//	 reset();
-		// }
-		
-		// if(queue.head){
-		//	 move = queue.pop(ITIME);
-		//	 motor_left.set_power(move.left);
-		//	 motor_right.set_power(move.right);
-		// } else{
-		//	 // serczin` und killin` !
-		//	 motor_left.set_power(0);
-		//	 motor_right.set_power(0);
-		// }
-		// 
+		loop();
 		wait_ms(ITIME);
 	}
 }

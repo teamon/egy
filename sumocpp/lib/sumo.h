@@ -260,6 +260,8 @@ void usart_write_number(long number);
 void usart_write_progmem_string(const char *string);
 unsigned char usart_read_byte();
 
+//lib/debug.cpp
+void reset();
 void send_ground_state_on_usart();
 void send_distance_state_on_usart();
 void progress();
