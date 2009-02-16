@@ -2,9 +2,9 @@
 
 // Numer aktualnie przetwarzanego portu
 volatile unsigned char dist_p = 0;
-volatile unsigned char values[6];
-volatile unsigned char prevs[6];
-volatile double p[6];
+int values[6];
+int prevs[6];
+double p[6];
 
 // Funkcja inicjalizująca czujniki odległości
 // UWAGA: zajmuje przetwornik AC
@@ -17,21 +17,27 @@ void dist_init(){
 	ADMUX = 0x60; //01100000
 	ADCSRA = 0xcd; //11001101
 	
+	for(dist_p=0; dist_p < 6; dist_p++) {
+		values[dist_p] = 0;
+		p[dist_p] = 1;
+	}
+	
 	// inicjalizacja numeru czujnika
 	dist_p = 1;
+	
 	sei();
 }
 
-unsigned char dist(char id){
+int dist(char id){
 	return values[id];
 }
 
 void kalman(int i, int k){
 	double P_ = p[k] + KQ;
 	double K = P_/(P_+KR);
-	values[k] = prevs[k]+K*(i-prevs[k]);
-	p[k] = (1 - K)*P_;
-	prevs[k] = values[k];
+	// values[k] = values[k]+K*(i-values[k]);
+	values[k] = values[k]+K;
+  // p[k] = (1 - K)*P_;
 }
 
 // Procedura przerwania od przetwornika AC
