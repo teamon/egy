@@ -267,6 +267,4 @@ void send_distance_state_on_usart();
 void progress();
 void debug();
 
-void kalman_init();
-
 #endif
