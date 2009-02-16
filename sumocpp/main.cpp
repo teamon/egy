@@ -45,6 +45,7 @@ void setup(){
 	dist_init();
 	servo_init();
 	if(DEBUG) usart_init();
+	kalman_init();
 	
 	leds_on();
 }

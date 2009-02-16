@@ -1,5 +1,17 @@
 #include "sumo.h"
 
+
+// tak na szybko wjebany kalman
+int v[6];
+double p[6];
+
+void kalman_init(){
+	for(int i=0; i < 6; i++) {
+		v[i] = 0;
+		p[i] = 1;
+	}
+}
+
 void reset(){
 	asm("cli"); 
 	asm("jmp 0"); 
@@ -28,29 +40,43 @@ void send_ground_state_on_usart(){
 }
 
 void send_distance_state_on_usart(){
+	
+	
+	// zrobmy sobie kalmana
+	for(int k=0; k < 6; k++) {
+		int i = dist(k);
+		
+		double P_ = p[k] + KQ;
+		double K = P_/(P_+KR);
+		v[k] = v[k]+K*(i-v[k]);
+		p[k] = (1 - K)*P_;
+	}
+		
+	
+	// tuuuu na dole zbiera z tablicy v[x] 
 	// leds_negate();
 	usart_write_progmem_string(PSTR("4:1:"));
-	usart_write_number((int)dist(0));
+	usart_write_number((int)v[0]);
 	usart_write_byte('\n');
 	
 	usart_write_progmem_string(PSTR("4:2:"));
-	usart_write_number((int)dist(1));
+	usart_write_number((int)v[1]);
 	usart_write_byte('\n');
 	
 	usart_write_progmem_string(PSTR("4:3:"));
-	usart_write_number((int)dist(2));
+	usart_write_number((int)v[2]);
 	usart_write_byte('\n');
 	
 	usart_write_progmem_string(PSTR("4:4:"));
-	usart_write_number((int)dist(3));
+	usart_write_number((int)v[3]);
 	usart_write_byte('\n');
 	
 	usart_write_progmem_string(PSTR("4:5:"));
-	usart_write_number((int)dist(4));
+	usart_write_number((int)v[4]);
 	usart_write_byte('\n');
 	
 	usart_write_progmem_string(PSTR("4:6:"));
-	usart_write_number((int)dist(5));
+	usart_write_number((int)v[5]);
 	usart_write_byte('\n');
 }
 
