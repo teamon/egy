@@ -1,9 +1,8 @@
 #include "sumo.h"
 #include "motor.h"
 
-Motor motor_left;
-Motor motor_right;
-	
+Motor motor[2];
+
 Motor::Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin){
 	REG = reg;
 	DIR_PORT = port;
@@ -43,7 +42,7 @@ void motor_init(){
 	clr(MOTOR1_DIR_PORT, MOTOR1_DIR_PIN);
 	clr(MOTOR2_DIR_PORT, MOTOR2_DIR_PIN);
 
-	motor_left = Motor(&OCR1A, &MOTOR1_DIR_PORT, MOTOR1_DIR_PIN);
-	motor_right = Motor(&OCR1B, &MOTOR2_DIR_PORT, MOTOR2_DIR_PIN);
+	motor[0] = Motor(&OCR1A, &MOTOR1_DIR_PORT, MOTOR1_DIR_PIN);
+	motor[1] = Motor(&OCR1B, &MOTOR2_DIR_PORT, MOTOR2_DIR_PIN);
 }
 

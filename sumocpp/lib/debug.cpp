@@ -1,5 +1,10 @@
 #include "sumo.h"
 
+void reset(){
+	asm("cli"); 
+	asm("jmp 0"); 
+}
+
 void send_ground_state_on_usart(){
 	usart_write_progmem_string(PSTR("2:1:"));
 	if (ground1_detected()) usart_write_byte('2');
@@ -62,4 +67,31 @@ void debug(){
 	progress();
 	send_ground_state_on_usart();
 	send_distance_state_on_usart();
+	
+	unsigned char c = usart_read_byte();
+	while (c!=0){
+		if(c=='*') reset();
+		
+		/*else if (c == '~'){ //motor
+			char lp = usart_read_byte();
+			char sign_c = usart_read_byte();
+			char sign;
+			switch (sign_c){
+				case 'f': 
+					sign = 1;
+					break;
+				case 'b':
+					sign = -1;
+					break;
+				case 'n':
+					sign=0;
+					break;
+			}
+			char power = usart_read_byte();
+			power *= sign;
+			SetMotor(lp, power);
+		}*/
+		
+		c = usart_read_byte();
+	}
 }

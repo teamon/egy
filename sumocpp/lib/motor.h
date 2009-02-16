@@ -14,7 +14,6 @@ private:
 	unsigned char DIR_PIN;
 };
 
-extern Motor motor_left;
-extern Motor motor_right;
+extern Motor motor[2];
 
 #endif
