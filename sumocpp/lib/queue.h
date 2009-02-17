@@ -14,9 +14,10 @@ public:
 	void push(char m1, char m2, int time);
 	void push(char m1, char m2, int time, int priority);
 	void clear();
+	bool empty();
 	Move* front();
-	Move dec(int time);
-	Move pop();
+	void dec(int time);
+	void pop();
 };
 
 #endif

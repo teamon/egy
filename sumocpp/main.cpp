@@ -3,13 +3,13 @@
 	D - distance
 	M - motor
 	----------------------
-	| G2	D1	D2	D3	G3 |
-	|										|
-	|										|
-	| M1							M2 |
-	|										|
-	|										|
-	| G5	D4	D5	D6	G7 |
+	| G1  D1  D3  D2  G2 
+	|
+	|
+	| M1				M2
+	|
+	|
+	| G3  D4  D6  D5  G4
 	----------------------
 */
 
@@ -20,37 +20,127 @@
 #define ITIME 50
 #define DEBUG 1
 
-Queue queue;
+Queue q;
 //Move move;
 
 //Motor motor[2];
-bool mleft = 0, mright = 1;
+bool front = 0, back = 1;
+bool zwarcie = 0;
+unsigned char zwarcieLen = 0;
 
-int Dist[6];
-double p[6];
+int Dist[2][3];
+double P[6];
 void kalmanize(){
 	for(int k=0; k < 6; k++) {
-		int i = dist(k);
-		
-		double P_ = p[k] + KQ;
+		int i = dist(k);		
+		double P_ = P[k] + KQ;
 		double K = P_/(P_+KR);
-		Dist[k] = Dist[k]+K*(i-Dist[k]);
-		p[k] = (1 - K)*P_;
+		Dist[k/3][k%3] = Dist[k/3][k%3]+K*(i-Dist[k/3][k%3]);
+		P[k] = (1 - K)*P_;
 	}
 }
 
-void reverse(){
-	//motory
-	mleft = !mleft;
-	mright = !mright;
+void moveStraight(int dist, char pri){
+	q.push(100, 100, dist, pri);
+}
+
+void unik(char pri){
+	//zakladam ze zatrzymanie i zmiana kierunku to proces czasochlonny
+	//wiec daze do zachowania jak najmniejszej ilosci zatrzyman/zmian	
+	bool ktorym = 0;
+	int wyn = motor[0].getPower()*motor[1].getPower();
+	if (wyn > 0){
+		ktorym = (Dist[front][0] > Dist[front][1]);//jezeli jest 
+		//szansa ze z jednej strony nic nie ma to zatrzymaj ten motor
+	}else if (wyn == 0){
+		//wybierz ten z mniejsza moca (czyli ten z zerem)
+		ktorym = (mabs(motor[0].getPower())>mabs(motor[1].getPower()));
+	}else{
+		//wybierz ten z wieksza moca (czyli dodatni)
+		ktorym = (motor[0].getPower()<motor[1].getPower());
+	}
 	
-	//disty
+	//jeden z silnikow sie zatrzyma, 2 pojedzie do tylu
+	q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);
+}
+
+void fikumiku(){
+	//motory, disty, groundy
+	//o ile dobrze pamietam to motorow nie trzeba bylo zamieniac stronami
+	//bo czujniki nie sa zamieniane stronami, wiec wystarczy zamiana
+	//przod<->tyl
 	
-	//groundy
+	front = !front;
+	back = !back;
+	motor[0].reverse = motor[1].reverse = front;
 	
+	q.clear();
+}
+
+unsigned char getGround(){
+	unsigned char out=1;
+	if (ground1_detected()) out*=(back)?2:5; // przod lewy
+	if (ground2_detected()) out*=(back)?3:7; // przod prawy
+	if (ground3_detected()) out*=(back)?5:2; // tyl lewy
+	if (ground4_detected()) out*=(back)?7:3; // tyl prawy
+	return out;
+}
+
+char getProbe(bool side){
+	if (!inrange(Dist[side][2], 120, 140)){ //zakres dla ringu
+		if (!inrange(Dist[side][0], 20, 70) 
+		&& !inrange(Dist[side][1], 20, 70)){ //nic nie ma z przodu więc kres
+			return 1; //koniec ringu
+		}else{
+			return 2; //zwarcie
+		}
+	}
+	return 0;
+}
+
+void planEscape(unsigned char grd, char fp, char bp){
+	q.clear();
+	if (grd == 1){
+		if (bp==1)
+			fikumiku();
+		
+		if (zwarcie)
+			unik(3);
+		else
+			moveStraight(20, 3);
+	}else{
+		if (grd%2==0 || grd%3==0)
+			fikumiku();
+		switch(grd){
+			default:
+			case 35:
+			case 6:
+				moveStraight(20, 3);
+				return;
+			
+			case 2:
+			case 5: //1 czujnik, jakis zakret
+				return;
+			
+			case 3:
+			case 7:
+				return;
+				
+			case 10:
+				return;
+				
+			case 21:
+				return;
+		}
+	}
 }
 
 void setup(){
+	for(int k=0; k < 6; k++) {
+		P[k] = 1;
+		Dist[k/3][k%3] = 0;
+	}
+	
 	led_init();
 	motor_init();
 	switch_init();
@@ -86,25 +176,53 @@ bool preLoop(){
 }
 
 void loop(){
-	if(DEBUG) debug();
-	if (usart_read_byte() == '*') reset();
-			
-	// if(switch1_pressed()){
-	//	 leds_negate();
-	//	 wait_ms(1000);
-	//	 reset();
-	// }
+	kalmanize();
 	
-	// if(queue.head){
-	//	 move = queue.pop(ITIME);
-	//	 motor_left.set_power(move.left);
-	//	 motor_right.set_power(move.right);
-	// } else{
-	//	 // serczin` und killin` !
-	//	 motor_left.set_power(0);
-	//	 motor_right.set_power(0);
-	// }
-	//
+	if(DEBUG) debug();
+	int pri = 0;
+	if (!q.empty())
+		pri = q.front()->pri;
+	
+	if (pri < 3){
+		//sprawdzam disty 3 i 6 i grd
+		unsigned char ground = getGround();
+		char fProbe = getProbe(front);
+		char bProbe = getProbe(!front);
+		
+		if (fProbe == 2 || bProbe == 2){
+			zwarcie = true;
+			zwarcieLen++;
+		}else{
+			zwarcieLen = 0;
+			zwarcie = false;
+		}
+		
+		if (ground!=1 || fProbe == 1 || bProbe == 1){
+			planEscape(ground, fProbe, bProbe);
+			pri = 3;
+		}else if (zwarcieLen>100){ //maksymalna sensowna dl zwarcia
+			if (bProbe==2)
+				fikumiku();
+
+			unik(2);
+			pri = 2;
+		}
+	}
+	if (pri < 2){
+		//sprawdzam disty 
+		
+		pri = 1;
+	}
+	
+	if (!q.empty()){
+		motor[0].setPower(q.front()->left);
+		motor[1].setPower(q.front()->right);
+		q.dec(1);
+	}else{
+		//szukaj
+		motor[0].stop();
+		motor[1].stop();
+	}	
 }
 
 int main(){

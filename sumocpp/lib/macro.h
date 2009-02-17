@@ -1,6 +1,9 @@
 #ifndef MACRO_H_
 #define MACRO_H_
 
+#define mabs(x) ((x<0)?-(x):x)
+#define inrange(x, from, to) (x>=from && x<=to)
+
 // Ustawia bit w bajcie
 #define setb(byte,bit) byte |= (1 << bit)
 // Zeruje bit w bajcie

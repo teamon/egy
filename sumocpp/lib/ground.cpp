@@ -12,15 +12,6 @@ void ground_init(){
 	clr(GROUND_PORT, GROUND4_PIN);
 }
 
-unsigned char ground(){
-	unsigned char out=1;
-	if (ground1_detected()) out*=2; // przod lewy
-	if (ground2_detected()) out*=3; // przod prawy
-	if (ground3_detected()) out*=5; // tyl lewy
-	if (ground4_detected()) out*=7; // tyl prawy
-	return out;
-}
-
 // Wykrywa białe podłoże (linię) pod czujnikiem 1
 unsigned char ground1_detected(){
 	return bit_is_clear(GROUND_PINPORT, GROUND1_PIN);

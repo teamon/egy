@@ -7,20 +7,37 @@ Motor::Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin){
 	REG = reg;
 	DIR_PORT = port;
 	DIR_PIN = pin;
+	
+	reverse = false;
 }
 
 void Motor::stop(){
 	*REG = 0;
 }
 
-void Motor::set_power(char p){
+void Motor::setPower(char p){
+	if (reverse)
+		p = -p;
+/*
+jezeli przy reverse==1 wrzucam p do przodu to power = -p
+gdy potem leci fikumiku() to reverse == 0 i getPower() zwraca power = -p
+gdy potem dostane taki sam power tzn. -p to ponizsza implikacja spowoduje
+wyjscie z funkcji, czyli wszystko ok :)
+*/	
+	if (p == getPower()) return;
+	power = p;
 	char dir = p; /// albo p/abs(p);
-	p = abs(p);
+	p = mabs(p);
 	if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;
 	*REG = p * 10;
 	
 	if(dir > 0) clr(*DIR_PORT, DIR_PIN); // do przodu
 	else if(dir < 0) setb(*DIR_PORT, DIR_PIN); // do tylu
+	else stop();
+}
+
+char Motor::getPower(){
+	return (reverse)?-power:power;
 }
 
 void motor_init(){
