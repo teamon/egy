@@ -6,7 +6,7 @@
 	| G1  D1  D3  D2  G2 
 	|
 	|
-	| M1				M2
+	| M1              M2
 	|
 	|
 	| G3  D4  D6  D5  G4
@@ -27,18 +27,6 @@ Queue q;
 bool front = 0, back = 1;
 bool zwarcie = 0;
 unsigned char zwarcieLen = 0;
-
-int Dist[2][3];
-double P[6];
-void kalmanize(){
-	for(int k=0; k < 6; k++) {
-		int i = dist(k);		
-		double P_ = P[k] + KQ;
-		double K = P_/(P_+KR);
-		Dist[k/3][k%3] = Dist[k/3][k%3]+K*(i-Dist[k/3][k%3]);
-		P[k] = (1 - K)*P_;
-	}
-}
 
 void moveStraight(int dist, char pri){
 	q.push(100, 100, dist, pri);
@@ -136,11 +124,6 @@ void planEscape(unsigned char grd, char fp, char bp){
 }
 
 void setup(){
-	for(int k=0; k < 6; k++) {
-		P[k] = 1;
-		Dist[k/3][k%3] = 0;
-	}
-	
 	led_init();
 	motor_init();
 	switch_init();

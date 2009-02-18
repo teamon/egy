@@ -238,7 +238,8 @@ unsigned char ground4_detected();
 
 // lib/dist.cpp
 void dist_init();
-int dist(char id);
+void kalmanize();
+extern int Dist[2][3];
 
 // lib/servo.cpp
 void servo_init();

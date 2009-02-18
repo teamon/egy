@@ -28,30 +28,13 @@ void send_ground_state_on_usart(){
 }
 
 void send_distance_state_on_usart(){
-	// leds_negate();
-	usart_write_progmem_string(PSTR("4:1:"));
-	usart_write_number((int)dist(0));
-	usart_write_byte('\n');
-	
-	usart_write_progmem_string(PSTR("4:2:"));
-	usart_write_number((int)dist(1));
-	usart_write_byte('\n');
-	
-	usart_write_progmem_string(PSTR("4:3:"));
-	usart_write_number((int)dist(2));
-	usart_write_byte('\n');
-	
-	usart_write_progmem_string(PSTR("4:4:"));
-	usart_write_number((int)dist(3));
-	usart_write_byte('\n');
-	
-	usart_write_progmem_string(PSTR("4:5:"));
-	usart_write_number((int)dist(4));
-	usart_write_byte('\n');
-	
-	usart_write_progmem_string(PSTR("4:6:"));
-	usart_write_number((int)dist(5));
-	usart_write_byte('\n');
+	for(int k=0; k < 6; k++) {
+		usart_write_progmem_string(PSTR("4:"));
+		usart_write_number(k+1);
+		usart_write_progmem_string(PSTR(":"));
+		usart_write_number(Dist[k/3][k%3]);
+		usart_write_byte('\n');
+	}
 }
 
 unsigned char progressVal = 1;
