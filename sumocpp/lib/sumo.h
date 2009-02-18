@@ -265,6 +265,6 @@ void reset();
 void send_ground_state_on_usart();
 void send_distance_state_on_usart();
 void progress();
-void debug();
+//void debug();
 
 #endif
