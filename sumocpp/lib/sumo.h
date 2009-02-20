@@ -8,44 +8,44 @@
 /* Opis wyprowadzeń procesora
  *
  * PORTA
- *   0 - DIST1 - czujnik odległości
- *   1 - DIST2 - czujnik odległości
- *   2 - DIST3 - czujnik odległości
- *   3 - DIST4 - czujnik odległości
- *   4 - AIN1 - wejscie analogowe
- *   5 - AIN2 - wejscie analogowe
- *   6 - AIN3 - wejście analogowe
- *   7 - AIN4 - wejście analogowe
+ *	 0 - DIST1 - czujnik odległości
+ *	 1 - DIST2 - czujnik odległości
+ *	 2 - DIST3 - czujnik odległości
+ *	 3 - DIST4 - czujnik odległości
+ *	 4 - AIN1 - wejscie analogowe
+ *	 5 - AIN2 - wejscie analogowe
+ *	 6 - AIN3 - wejście analogowe
+ *	 7 - AIN4 - wejście analogowe
  * 
  * PORTB
- *   0 - GROUND1 - czujnik podłoża
- *   1 - GROUND2 - czujnik podłoża
- *   2 - GROUND3 - czujnik podłoża
- *   3 - GROUND4 - czujnik podłoża
- *   4 - LED_LE - wyjscie sterownika diod
- *   5 - MOSI - używany do programowania
- *   6 - MISO - używany do programowania
- *   7 - SCK - używany do programowania
+ *	 0 - GROUND1 - czujnik podłoża
+ *	 1 - GROUND2 - czujnik podłoża
+ *	 2 - GROUND3 - czujnik podłoża
+ *	 3 - GROUND4 - czujnik podłoża
+ *	 4 - LED_LE - wyjscie sterownika diod
+ *	 5 - MOSI - używany do programowania
+ *	 6 - MISO - używany do programowania
+ *	 7 - SCK - używany do programowania
  * 
  * PORTC
- *   0 - M1_DIR - kierunek obrotów silnika
- *   1 - M2_DIR - kierunek obrotów silnika
- *   2 - SERVO1 - wyjśćie serwomechanizmu
- *   3 - SERVO2 - wyjśćie serwomechanizmu
- *   4 - SERVO3 - wyjśćie serwomechanizmu
- *   5 - SERVO4 - wyjśćie serwomechanizmu
- *   6 - LED_CLK - wyjśćie sterownika diod
- *   7 - LED_SDI - wyjśćie sterownika diod
- *  
+ *	 0 - M1_DIR - kierunek obrotów silnika
+ *	 1 - M2_DIR - kierunek obrotów silnika
+ *	 2 - SERVO1 - wyjśćie serwomechanizmu
+ *	 3 - SERVO2 - wyjśćie serwomechanizmu
+ *	 4 - SERVO3 - wyjśćie serwomechanizmu
+ *	 5 - SERVO4 - wyjśćie serwomechanizmu
+ *	 6 - LED_CLK - wyjśćie sterownika diod
+ *	 7 - LED_SDI - wyjśćie sterownika diod
+ *	
  * PORTD
- *   0 - RXD - port szeregowy
- *   1 - TXD - port szeregowy
- *   2 - SWITCH1 - przycisk
- *   3 - SWITCH2 - przycisk
- *   4 - M1_PWM - start/stop silnika
- *   5 - M2_PWM - start/stop silnika
- *   6 - SIG - sygnał do wykorzystania
- *   7 - GRD_PWM - regulacja mocy diod czujników podłoża
+ *	 0 - RXD - port szeregowy
+ *	 1 - TXD - port szeregowy
+ *	 2 - SWITCH1 - przycisk
+ *	 3 - SWITCH2 - przycisk
+ *	 4 - M1_PWM - start/stop silnika
+ *	 5 - M2_PWM - start/stop silnika
+ *	 6 - SIG - sygnał do wykorzystania
+ *	 7 - GRD_PWM - regulacja mocy diod czujników podłoża
  *
  */
 

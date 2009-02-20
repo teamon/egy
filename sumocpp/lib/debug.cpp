@@ -32,14 +32,15 @@ void send_distance_state_on_usart(){
 		usart_write_progmem_string(PSTR("4:"));
 		usart_write_number(k+1);
 		usart_write_progmem_string(PSTR(":"));
-		usart_write_number(Dist[k/3][k%3]);
+		//usart_write_number(Dist[k/3][k%3]);
+		usart_write_number(dist(k));
 		usart_write_byte('\n');
 	}
 }
 
 unsigned char progressVal = 0;
 void progress(){
-  if (progressVal == 8) progressVal = 0;
-  else progressVal++;
-  led_set(1 << progressVal);
+	if (progressVal == 8) progressVal = 0;
+	else progressVal++;
+	led_set(1 << progressVal);
 }
