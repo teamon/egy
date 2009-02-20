@@ -1,28 +1,23 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-class Move
-{
-  public:
-  int left, right, time;
+struct Move{
+	char left, right, pri;
+	int time;
 };
 
-class Queue
-{
-  public:
-    struct Item
-    {
-      Move move;
-      Item* next;
-    } *head, *tail;
-    
-    Queue();
-    ~Queue();
-    void push(Move move);
-    void push(char m1, char m2, int time);
-    void clear();
-    Move pop(int time);
-    Move pop();
+class Queue{
+public:	 
+	Queue();
+	~Queue();
+	void push(Move move);
+	void push(char m1, char m2, int time);
+	void push(char m1, char m2, int time, int priority);
+	void clear();
+	bool empty();
+	Move* front();
+	void dec(int time);
+	void pop();
 };
 
 #endif

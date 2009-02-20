@@ -1,6 +1,10 @@
 #ifndef SUMO_H_
 #define SUMO_H_
 
+//kalman
+#define KR 0.05
+#define KQ 0.0003
+
 /* Opis wyprowadzeń procesora
  *
  * PORTA
@@ -50,7 +54,7 @@
 // Częstotliwość kwarcu
 #define F_CPU 7372800L
 // Prędkość transmisji po RSie
-#define USART_SPEED 9600L
+#define USART_SPEED 4800L
 
 
 // Port wyjścia PWM silnika 1
@@ -242,7 +246,6 @@ void wait_ms(int ms);
 
 // lib/motor.cpp
 void motor_init();
-void motors(Move move);
 
 // lib/switch.cpp
 void switch_init();
@@ -253,7 +256,6 @@ void wait_switch2();
 
 // lib/ground.cpp
 void ground_init();
-unsigned char ground();
 unsigned char ground1_detected();
 unsigned char ground2_detected();
 unsigned char ground3_detected();
@@ -262,6 +264,9 @@ unsigned char ground4_detected();
 // lib/dist.cpp
 void dist_init();
 unsigned char dist(char id);
+void kalmanize();
+extern int Dist[2][3];
+
 
 // lib/servo.cpp
 void servo_init();
@@ -290,5 +295,11 @@ void usart_write_number(long number);
 void usart_write_progmem_string(const char *string);
 unsigned char usart_read_byte();
 
+//lib/debug.cpp
+void reset();
+void send_ground_state_on_usart();
+void send_distance_state_on_usart();
+void progress();
+//void debug();
 
 #endif

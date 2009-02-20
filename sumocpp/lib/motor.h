@@ -1,21 +1,22 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
-class Motor
-{
+class Motor{
 public:
-  Motor(){}
-  Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin);
-  void set_power(char power);
-  void stop();
+	Motor(){}
+	Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin);
+	void setPower(char power);
+	void stop();
+	char getPower();
+	bool reverse;
 
 private:
-  volatile uint16_t* REG;
-  volatile uint8_t* DIR_PORT;
-  unsigned char DIR_PIN;
+	volatile uint16_t* REG;
+	volatile uint8_t* DIR_PORT;
+	unsigned char DIR_PIN;
+	char power;
 };
 
-extern Motor motor_left;
-extern Motor motor_right;
+extern Motor motor[2];
 
 #endif

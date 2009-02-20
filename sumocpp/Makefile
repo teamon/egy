@@ -1,7 +1,7 @@
 PROGNAME=main
 CC=avr-g++
 MMCU=atmega32
-OPT= -O2
+OPT= -O2 -w
 ARGS=$(OPT) -mmcu=$(MMCU)
 HEX=$(PROGNAME).hex
 
@@ -10,12 +10,15 @@ all: $(HEX)
 $(HEX): $(PROGNAME).elf
 	avr-objcopy -O ihex $^ $@
 	
-$(PROGNAME).elf: $(PROGNAME).o lib/dist.cpp lib/ground.cpp lib/led.cpp lib/motor.cpp lib/queue.cpp lib/servo.cpp lib/switch.cpp lib/usart.cpp lib/wait.cpp
+$(PROGNAME).elf: $(PROGNAME).o lib/debug.cpp lib/dist.cpp lib/ground.cpp lib/led.cpp lib/motor.cpp lib/queue.cpp lib/servo.cpp lib/switch.cpp lib/usart.cpp lib/wait.cpp
 	$(CC) $(ARGS) $^ -o $@	
 	
 $(PROGNAME).o: $(PROGNAME).cpp
 	$(CC) $(ARGS) -c $(PROGNAME).cpp -o $@
 	
+lib/debug.o: lib/debug.cpp lib/sumo.h
+	$(CC) $(ARGS) -c lib/debug.cpp -o $@
+
 lib/dist.o: lib/dist.cpp lib/sumo.h
 	$(CC) $(ARGS) -c lib/dist.cpp -o $@
 
