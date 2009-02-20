@@ -44,3 +44,7 @@ void progress(){
 	else progressVal++;
 	led_set(1 << progressVal);
 }
+
+void countdown(char val){
+	led_set((1<<(val-1))*(val>0));
+}

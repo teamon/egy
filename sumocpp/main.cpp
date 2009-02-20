@@ -172,31 +172,46 @@ void setup(){
 
 unsigned char ticks = 0;
 bool odliczanie = false;
-bool hold = false;
+bool hold = false, hold2 = false;
+char strategia = 0;
 bool preLoop(){
 	if (DEBUG){
 		if (usart_read_byte() == '!'){
 			usart_write_progmem_string(PSTR("Bonjour\n"));
 			return true;
 		}
-	}else {
+	}//else {
 		if (switch1_pressed() && !hold){
 			odliczanie = !odliczanie;
 			ticks = 0;
 			hold = true;
-		}else if(!switch1_pressed())
+		}else if(!switch1_pressed()){
 			hold = false;
+		}
 		
+		if (switch2_pressed() && !hold2){
+			strategia ++;
+			if (strategia>7) strategia = 0;
+			led_set(1<<strategia);
+			
+			odliczanie = false;
+			hold2 = true;
+		}else if (!switch2_pressed())
+			hold2 = false;
+
 		ticks += odliczanie;
 		if (ticks >= 5000/ITIME) return true;
-	}
+		if (odliczanie)
+			led_set(1<<(5-ticks*5*ITIME/5000));
+	//}
 	return false;
 }
 
 void loop(){
 	kalmanize();
 	
-	if(DEBUG) debug();
+	if(DEBUG) 
+		debug();
 	return;
 	int pri = 0;
 	if (!q.empty())
@@ -246,8 +261,10 @@ void loop(){
 
 int main() {
 	setup();
-
-	//while(!preLoop()) wait_ms(ITIME);
+	
+	led_set(1);
+	
+	while(!preLoop()) wait_ms(ITIME);
 
 	for(;;){
 		loop();
