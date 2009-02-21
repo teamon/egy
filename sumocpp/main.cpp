@@ -167,7 +167,9 @@ void setup(){
 	ground_init();
 	dist_init();
 	servo_init();
-	if(DEBUG) usart_init();
+	if(DEBUG) {
+		usart_init();
+	}
 }
 
 unsigned char ticks = 0;
@@ -176,7 +178,9 @@ bool hold = false, hold2 = false;
 char strategia = 0;
 bool preLoop(){
 	if (DEBUG){
+		usart_write_byte(0);
 		if (usart_read_byte() == '!'){
+			led_set(255);
 			usart_write_progmem_string(PSTR("Bonjour\n"));
 			return true;
 		}
