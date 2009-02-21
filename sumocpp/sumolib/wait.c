@@ -1,6 +1,13 @@
-#include "sumo.h"
+/**
+ * Funkcje opóźniające
+ */
 
-// Czeka podaną ilość sekund
+#include "sumolib.h"
+
+
+/**
+ * Czeka podaną ilość sekund
+ */
 void wait_s(int s) {
 	int i;
 	unsigned char j;
@@ -11,7 +18,10 @@ void wait_s(int s) {
 	}
 }
 
-// Czeka podaną ilość milisekund
+
+/**
+ * Czeka podaną ilość milisekund
+ */
 void wait_ms(int ms) {
 	int i;
 	for (i=0; i<ms; i++) {

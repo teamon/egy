@@ -1,7 +1,7 @@
-PROGNAME=main
-CC=avr-g++
+PROGNAME=basic
+CC=avr-gcc
 MMCU=atmega32
-OPT= -O2 -w
+OPT= -O2
 ARGS=$(OPT) -mmcu=$(MMCU)
 HEX=$(PROGNAME).hex
 
@@ -10,44 +10,47 @@ all: $(HEX)
 $(HEX): $(PROGNAME).elf
 	avr-objcopy -O ihex $^ $@
 	
-$(PROGNAME).elf: $(PROGNAME).o lib/debug.cpp lib/dist.cpp lib/ground.cpp lib/led.cpp lib/motor.cpp lib/queue.cpp lib/servo.cpp lib/switch.cpp lib/usart.cpp lib/wait.cpp
+$(PROGNAME).elf: $(PROGNAME).o sumolib/led.o sumolib/sled.o sumolib/switch.o sumolib/ground.o sumolib/distance.o sumolib/servo.o sumolib/motor.o sumolib/usart.o sumolib/wait.o sumolib/random.o
 	$(CC) $(ARGS) $^ -o $@	
 	
-$(PROGNAME).o: $(PROGNAME).cpp
-	$(CC) $(ARGS) -c $(PROGNAME).cpp -o $@
+$(PROGNAME).o: $(PROGNAME).c sumoconfig.h
+	$(CC) $(ARGS) -c $(PROGNAME).c -o $@
+
+sumolib/sled.o: sumolib/sled.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/sled.c -o $@
 	
-lib/debug.o: lib/debug.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/debug.cpp -o $@
-
-lib/dist.o: lib/dist.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/dist.cpp -o $@
-
-lib/ground.o: lib/ground.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/ground.cpp -o $@
-
-lib/led.o: lib/led.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/led.cpp -o $@
-
-lib/motor.o: lib/motor.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/motor.cpp -o $@
-
-lib/queue.o: lib/queue.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/queue.cpp -o $@
-
-lib/servo.o: lib/servo.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/servo.cpp -o $@
-
-lib/switch.o: lib/switch.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/switch.cpp -o $@
-
-lib/usart.o: lib/usart.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/usart.cpp -o $@
-
-lib/wait.o: lib/wait.cpp lib/sumo.h
-	$(CC) $(ARGS) -c lib/wait.cpp -o $@
+sumolib/switch.o: sumolib/switch.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/switch.c -o $@	
+	
+sumolib/ground.o: sumolib/ground.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/ground.c -o $@	
+	
+sumolib/distance.o: sumolib/distance.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/distance.c -o $@
+	
+sumolib/servo.o: sumolib/servo.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/servo.c -o $@	
+	
+sumolib/motor.o: sumolib/motor.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/motor.c -o $@		
+	
+sumolib/usart.o: sumolib/usart.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/usart.c -o $@	
+	
+sumolib/wait.o: sumolib/wait.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/wait.c -o $@	
+	
+sumolib/random.o: sumolib/random.c sumolib/sumolib.h sumoconfig.h
+	$(CC) $(ARGS) -c sumolib/random.c -o $@	
 	
 clean:
 	rm -f *.o
 	rm -f sumolib/*.o
 	rm -f $(PROGNAME).elf
+	
 
+	
+	
+	
+	
+	

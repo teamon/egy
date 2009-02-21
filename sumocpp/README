@@ -1,5 +1,0 @@
-egy
-===
-
-$ ./rmake --help
-$ ./rmake -mp main

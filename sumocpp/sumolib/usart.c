@@ -1,17 +1,25 @@
-#include "sumo.h"
+/**
+ * Funkcje do obsługi transmisji szeregowej
+ */
 
-// Inicjalizacja USATRu
+#include "sumolib.h"
+
+/**
+ * Inicjalizacja USATRu
+ */
 void usart_init() {
 	// Nadawanie i odbiór
 	UCSRB = 0x18; 
 	// asynchronicznie 8N1
-	UCSRC = 0x86;	
+	UCSRC = 0x86;  
 	// konfiguracja prędkości
 	UBRRH = 0;
-	UBRRL = (F_CPU/(USART_SPEED*16))-1;	
+	UBRRL = (F_CPU/(USART_SPEED*16))-1;  
 }
 
-// Wysłanie bajtu na RS
+/**
+ * Wysłanie bajtu na RS
+ */
 void usart_write_byte(unsigned char byte) {
 	// sprawdzenie zezwolenia
 	while (!(UCSRA & (1<<5)));
@@ -19,7 +27,9 @@ void usart_write_byte(unsigned char byte) {
 	UDR = byte;
 }
 
-// Wysłanie łańcucha znaków na RS
+/**
+ * Wysłanie łańcucha znaków na RS
+ */
 void usart_write_string(char *string) {
 	while (*string != '\0')
 	{
@@ -28,7 +38,9 @@ void usart_write_string(char *string) {
 	}
 }
 
-// Wysłanie łańcucha znaków z pamięci programu
+/**
+ * Wysłanie łańcucha znaków z pamięci programu
+ */
 void usart_write_progmem_string(const char *string) {
 	char sign;
 	sign = pgm_read_byte(string);
@@ -41,7 +53,9 @@ void usart_write_progmem_string(const char *string) {
 }
 
 
-// Wysłanie liczby na RS
+/**
+ * Wysłanie liczby na RS
+ */
 void usart_write_number(long number)
 {
 	unsigned char i,j,k;
@@ -101,13 +115,14 @@ void usart_write_number(long number)
 	}
 }
 
-// Odbieranie bajtu z ES
-// funkcja zwraca 0 jeśli nic nie przyszło
+/**
+ * Odbieranie bajtu z ES
+ * funkcja zwraca 0 jeśli nic nie przyszło
+ */
 unsigned char usart_read_byte() {
 	if (UCSRA & (1<<7))
 		return UDR;
 	else
 		return 0;
 }
-
 
