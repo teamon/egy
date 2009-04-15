@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require "optparse"
 
-LIBS = Dir["lib/*.cpp"]
+LIBS = Dir["sumolib/*.c"]
 
 options = {}
 OptionParser.new do |o|
@@ -25,17 +25,21 @@ if options[:remove]
 	puts "done."
 end
 
-progname = ARGV.first.tr('.cpp', '')
+unless ARGV.first
+  puts "Podaj nazwe pliczq"
+  exit
+end
+progname = ARGV.first.sub('.c', '')
 
 makefile_libs = LIBS.map do |name|
 	name = name.split('.').first
-	"#{name}.o: #{name}.cpp lib/sumo.h
-	$(CC) $(ARGS) -c #{name}.cpp -o $@"
+	"#{name}.o: #{name}.c sumoconfig.h
+	$(CC) $(ARGS) -c #{name}.c -o $@"
 end.join("\n\n")
 
 makefile = <<-MAKEFILE
 PROGNAME=#{progname}
-CC=avr-g++
+CC=avr-gcc
 MMCU=atmega32
 OPT= -O2 -w
 ARGS=$(OPT) -mmcu=$(MMCU)
@@ -49,8 +53,8 @@ $(HEX): $(PROGNAME).elf
 $(PROGNAME).elf: $(PROGNAME).o #{LIBS.join(" ")}
 	$(CC) $(ARGS) $^ -o $@	
 	
-$(PROGNAME).o: $(PROGNAME).cpp
-	$(CC) $(ARGS) -c $(PROGNAME).cpp -o $@
+$(PROGNAME).o: $(PROGNAME).c
+	$(CC) $(ARGS) -c $(PROGNAME).c -o $@
 	
 #{makefile_libs}
 	
