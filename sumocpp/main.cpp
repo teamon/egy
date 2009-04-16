@@ -229,16 +229,16 @@ void loop(){
 		
 		if (fProbe == 2 || bProbe == 2){
 			zwarcie = true;
-			zwarcieLen++;
+			zwarcieLen+=(zwarcieLen < 200);
 		}else{
-			zwarcieLen = 0;
+			zwarcieLen-=(zwarcieLen!=0);
 			zwarcie = false;
 		}
 		
 		if (ground!=1 || fProbe == 1 || bProbe == 1){
 			planEscape(ground, fProbe, bProbe);
 			pri = 3;
-		}else if (zwarcieLen>100){ //maksymalna sensowna dl zwarcia
+		}else if (zwarcieLen>100 && zwarcie){ //maksymalna sensowna dl zwarcia
 			if (bProbe==2)
 				fikumiku();
  
