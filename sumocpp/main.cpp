@@ -109,31 +109,31 @@ void planEscape(unsigned char grd, char fp, char bp){
 		}
 		switch(grd){
 			//default:
-			case 35:
-			case 6:
+			case 35: // tyl
+			case 6: // przod
 				moveStraight(20, 3);
 				//stopMotor(10,3);
 				return;
 			
-			case 2:
-			case 5: //1 czujnik, jakis zakret
-			stopMotor(10,3);
+			case 2: // przod lewy
+			case 5: // tyl lewy
+				stopMotor(10,3);
 				//moveStraight(20, 3);
 				return;
 			
-			case 3:
-			case 7:
+			case 3: // przod prawy
+			case 7: // tyl prawy
 				stopMotor(10,3);
 				//moveStraight(20, 3);
 				return;
 				
-			case 10:
-			stopMotor(10,3);
+			case 10: // lewo
+				stopMotor(10,3);
 				//moveStraight(20, 3);
 				return;
 				
-			case 21:
-			stopMotor(10,3);
+			case 21: // prawo
+				stopMotor(10,3);
 				//moveStraight(20, 3);
 				return;
 		}
@@ -186,7 +186,7 @@ void setup(){
 	switch_init();
 	ground_init();
 	dist_init();
-	servo_init();
+	// servo_init(); // na razie niepotrzebne
 	if(DEBUG) {
 		usart_init();
 	}
