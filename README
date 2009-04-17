@@ -1,5 +1,13 @@
-egy sumobot 2.0
+TODO:
+*Disty (wszystko)
+*Zakręty (zakręty do ucieczki)
+*Strategie
+*Zwarcie
+*Disty ukośne
+*Obroty
 
+egy
+===
 
 $ ./rmake --help
 $ ./rmake -mp main
