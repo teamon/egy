@@ -30,8 +30,10 @@ wyjscie z funkcji, czyli wszystko ok :)
 
 	char dir = p; /// albo p/abs(p);
 	p = abs(p);
-	if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;
-	*REG = p * 10;
+	// if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;	
+	//*REG = p * 1;
+	if(p > 100) p = 100;
+	*REG = (MOTOR_MAX_POWER*(int)p/100);
 	
 	if(dir > 0) clr(*DIR_PORT, DIR_PIN); // do przodu
 	else if(dir < 0) setb(*DIR_PORT, DIR_PIN); // do tylu

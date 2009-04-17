@@ -18,10 +18,11 @@
 #include "lib/queue.h"
 
 #define ITIME 50
-#define DEBUG 1
+#define DEBUG 0
+#define WAIT 1000
 
 Queue q;
-bool front = 0, back = 1;
+bool front = 0;
 bool zwarcie = 0;
 unsigned char zwarcieLen = 0;
 
@@ -32,7 +33,6 @@ void fikumiku(){
 	//przod<->tyl
 	
 	front = !front;
-	back = !back;
 	motor[0].reverse = motor[1].reverse = front;
 	
 	q.clear();
@@ -41,7 +41,11 @@ void fikumiku(){
 void moveStraight(int dist, char pri){
 	q.push(100, 100, dist, pri);
 }
- 
+
+void setTurn(int rad, int angle, char pri){
+	
+}
+
 void unik(char pri){
 	//zakladam ze zatrzymanie i zmiana kierunku to proces czasochlonny
 	//wiec daze do zachowania jak najmniejszej ilosci zatrzyman/zmian	
@@ -64,10 +68,10 @@ void unik(char pri){
 
 unsigned char getGround(){
 	unsigned char out=1;
-	if (ground1_detected()) out*=(back)?2:5; // przod lewy
-	if (ground2_detected()) out*=(back)?3:7; // przod prawy
-	if (ground3_detected()) out*=(back)?5:2; // tyl lewy
-	if (ground4_detected()) out*=(back)?7:3; // tyl prawy
+	if (ground1_detected()) out*=(!front)?2:5; // przod lewy
+	if (ground2_detected()) out*=(!front)?3:7; // przod prawy
+	if (ground3_detected()) out*=(!front)?5:2; // tyl lewy
+	if (ground4_detected()) out*=(!front)?7:3; // tyl prawy
 	return out;
 }
  
@@ -94,6 +98,7 @@ void planEscape(unsigned char grd, char fp, char bp){
 		else
 			moveStraight(20, 3);
 	}else{
+		exit(0);
 		if (grd%2==0 || grd%3==0)
 			fikumiku();
 		switch(grd){
@@ -176,6 +181,7 @@ unsigned char ticks = 0;
 bool odliczanie = false;
 bool hold = false, hold2 = false;
 char strategia = 0;
+int power = 1;
 bool preLoop(){
 	if (DEBUG){
 		usart_write_byte(0);
@@ -185,28 +191,28 @@ bool preLoop(){
 			return true;
 		}
 	}//else {
-		if (switch1_pressed() && !hold){
-			odliczanie = !odliczanie;
-			ticks = 0;
-			hold = true;
-		}else if(!switch1_pressed()){
-			hold = false;
-		}
+	if (switch1_pressed() && !hold){
+		odliczanie = !odliczanie;
+		ticks = 0;
+		hold = true;
+	}else if(!switch1_pressed()){
+		hold = false;
+	}
+	
+	if (switch2_pressed() && !hold2){
+		strategia ++;
+		if (strategia>7) strategia = 0;
+		led_set(1<<strategia);
 		
-		if (switch2_pressed() && !hold2){
-			strategia ++;
-			if (strategia>7) strategia = 0;
-			led_set(1<<strategia);
-			
-			odliczanie = false;
-			hold2 = true;
-		}else if (!switch2_pressed())
-			hold2 = false;
+		odliczanie = false;
+		hold2 = true;
+	}else if (!switch2_pressed())
+		hold2 = false;
 
-		ticks += odliczanie;
-		if (ticks >= 5000/ITIME) return true;
-		if (odliczanie)
-			led_set(1<<(5-ticks*5*ITIME/5000));
+	ticks += odliczanie;
+	if (ticks >= WAIT/ITIME) return true;
+	if (odliczanie)
+		led_set(1<<(5-ticks*5*ITIME/WAIT));
 	//}
 	return false;
 }
@@ -214,16 +220,19 @@ bool preLoop(){
 void loop(){
 	kalmanize();
 	
-	if(DEBUG) 
+	if(DEBUG){
 		debug();
-	return;
+		return;
+	}
 	int pri = 0;
+	
 	if (!q.empty())
 		pri = q.front()->pri;
 	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
+		//led_set(ground);
 		char fProbe = getProbe(front);
 		char bProbe = getProbe(!front);
 		
@@ -258,8 +267,11 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
+		motor[0].setPower(100);
+		motor[1].setPower(100);
+		/*
 		motor[0].stop();
-		motor[1].stop();
+		motor[1].stop();*/
 	}	
 }
 
@@ -269,9 +281,22 @@ int main() {
 	led_set(1);
 	
 	while(!preLoop()) wait_ms(ITIME);
-
+	
+	switch (strategia){
+		case 1:
+			motor[0].setPower(50);
+			motor[1].setPower(50);
+		break;
+		case 2:
+		
+		break;
+		default:
+		break;
+	}
 	for(;;){
 		loop();
+		// unsigned char ground = getGround();
+		// led_set(ground);
 		wait_ms(ITIME);
 	}
 }

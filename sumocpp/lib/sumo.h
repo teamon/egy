@@ -203,7 +203,7 @@
 // 0x05 - preskaler=1024
 #define PWM_PRESCALLER_CONFIG 0x02
 
-#define MOTOR_MAX_POWER 50 // tak zeby nie zjarac serw :p
+#define MOTOR_MAX_POWER 300 // tak zeby nie zjarac serw :p
 
 
 #include "macro.h"
