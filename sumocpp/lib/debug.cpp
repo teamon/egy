@@ -5,6 +5,32 @@ void reset(){
 	asm("jmp 0"); 
 }
 
+void led_grd(){
+	if (ground1_detected()) {
+		led1_on();
+	} else {
+		led1_off();
+	}
+	// czujnik GRD 2
+	if (ground2_detected()) {
+		led2_on();
+	} else {
+		led2_off();
+	}
+	// czujnik GRD 3
+	if (ground3_detected()) {
+		led3_on();
+	} else {
+		led3_off();
+	}
+	// czujnik GRD 4
+	if (ground4_detected()) {
+		led4_on();
+	} else {
+		led4_off();
+	}
+}
+
 void send_ground_state_on_usart(){
 	usart_write_progmem_string(PSTR("2:1:"));
 	if (ground1_detected()) usart_write_byte('2');
@@ -38,9 +64,9 @@ void send_distance_state_on_usart(){
 	}
 }
 
-unsigned char progressVal = 0;
+unsigned char progressVal = 1;
 void progress(){
-	if (progressVal == 8) progressVal = 0;
+	if (progressVal == 8) progressVal = 1;
 	else progressVal++;
 	led_set(1 << progressVal);
 }

@@ -42,6 +42,10 @@ void moveStraight(int dist, char pri){
 	q.push(100, 100, dist, pri);
 }
 
+void stopMotor(int dist, char pri){
+	q.push(0, 0, dist, pri);
+}
+
 void setTurn(int rad, int angle, char pri){
 	
 }
@@ -88,6 +92,7 @@ char getProbe(bool side){
 }
  
 void planEscape(unsigned char grd, char fp, char bp){
+	//led_set(grd);
 	q.clear();
 	if (grd == 1){
 		if (bp==1)
@@ -98,28 +103,38 @@ void planEscape(unsigned char grd, char fp, char bp){
 		else
 			moveStraight(20, 3);
 	}else{
-		exit(0);
-		if (grd%2==0 || grd%3==0)
+		if (grd%2==0 || grd%3==0){
 			fikumiku();
+			led_set(255);
+		}
 		switch(grd){
-			default:
+			//default:
 			case 35:
 			case 6:
 				moveStraight(20, 3);
+				//stopMotor(10,3);
 				return;
 			
 			case 2:
 			case 5: //1 czujnik, jakis zakret
+			stopMotor(10,3);
+				//moveStraight(20, 3);
 				return;
 			
 			case 3:
 			case 7:
+				stopMotor(10,3);
+				//moveStraight(20, 3);
 				return;
 				
 			case 10:
+			stopMotor(10,3);
+				//moveStraight(20, 3);
 				return;
 				
 			case 21:
+			stopMotor(10,3);
+				//moveStraight(20, 3);
 				return;
 		}
 	}
@@ -219,22 +234,24 @@ bool preLoop(){
 
 void loop(){
 	kalmanize();
+	unsigned char ground = getGround();
 	
 	if(DEBUG){
 		debug();
 		return;
 	}
 	int pri = 0;
-	
-	if (!q.empty())
+	if (!q.empty()){
 		pri = q.front()->pri;
-	
+		//led_set(pri);
+	}
+			
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
-		//led_set(ground);
-		char fProbe = getProbe(front);
-		char bProbe = getProbe(!front);
+		//if (pri == 0) led_set(ground);
+		char fProbe = 0;//getProbe(front);
+		char bProbe = 0;//getProbe(!front);
 		
 		if (fProbe == 2 || bProbe == 2){
 			zwarcie = true;
@@ -267,7 +284,7 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(100);
+		motor[0].setPower(60);
 		motor[1].setPower(100);
 		/*
 		motor[0].stop();
@@ -281,6 +298,9 @@ int main() {
 	led_set(1);
 	
 	while(!preLoop()) wait_ms(ITIME);
+	led_set(0);
+	
+	q.clear();
 	
 	switch (strategia){
 		case 1:
