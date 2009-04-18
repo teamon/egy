@@ -260,6 +260,7 @@ unsigned char ground1_detected();
 unsigned char ground2_detected();
 unsigned char ground3_detected();
 unsigned char ground4_detected();
+extern char Ground[4];
 
 // lib/dist.cpp
 void dist_init();

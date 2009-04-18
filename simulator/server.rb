@@ -7,7 +7,9 @@ loop do
     puts "#{s} is accepted"
     while input = s.recv(100)
       puts "input received: #{input}"
-      output = "you typed: #{input}"
+      output = [0,0,0,0].join(":")
+      
+      puts "sending output=#{output}"
 
       s.write(output)
     end
