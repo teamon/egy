@@ -36,12 +36,14 @@ string generateMessage(){
 }
 
 void parseReply(string reply){
-	// G1:G2:G3:G4
+	// SW1:SW2 
 	vector<int> items;
 	split(reply, ":", &items);
-	for(int i=0; i<4; ++i){
-		Ground[i] = items.at(i);
-	}
+	int i=0;
+	for(;i<2; i++) Switch[i] = items.at(i);
+	// for(int i=0; i<4; ++i){
+	// 	Ground[i] = items.at(i);
+	// }
 }
 
 void simulate(){

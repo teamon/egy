@@ -1,16 +1,17 @@
 #include "sumo.h"
 
+unsigned char Switch[2];
 // Inicjalizacja przycisków
 void switch_init() {}
 
 // Sprawdzenie, czy przycisk 1 naciśnięty
 unsigned char switch1_pressed() {
-	return 0;
+	return Switch[0];
 }
 
 // Sprawdzenie, czy przycisk 2 naciśnięty
 unsigned char switch2_pressed() {
-	return 0;
+	return Switch[1];
 }
 
 // Czekanie na naciśnięcie przycisku 1

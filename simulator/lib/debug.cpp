@@ -10,7 +10,7 @@ void send_distance_state_on_usart(){}
 
 unsigned char progressVal = 1;
 void progress(){
-	if (progressVal == 8) progressVal = 0;
+	if (progressVal > 7) progressVal = 0;
 	else progressVal++;
 	led_set(1 << progressVal);
 }

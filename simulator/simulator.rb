@@ -2,6 +2,8 @@ require 'ruby-processing'
 require 'socket'
 
 class Simulator < Processing::App
+  load_ruby_library "control_panel" 
+  
   def setup
     @server = Thread.new { 
       setup_server 
@@ -36,7 +38,14 @@ class Simulator < Processing::App
     
     
     @ground = []
+    @switch1, @switch2 = 0, 0
     
+    
+    control_panel do |c|
+      c.button :switch1
+      c.button :switch2
+    end
+          
     text_size 15
   end
   
@@ -55,12 +64,9 @@ class Simulator < Processing::App
       t = Thread.start(server_sock.accept) do |s|
         puts "#{s} is accepted"
         while input = s.recv(100)
-          puts "input received: #{input}"
-          process_message(input)
-          output = [0,0,0,0].join(":")
-      
-          puts "sending output=#{output}"
-      
+          input = input.chomp
+          output = parse_message(input)
+          puts "#{input} => #{output}"
           s.write(output)
         end
         s.close
@@ -69,13 +75,36 @@ class Simulator < Processing::App
     end
   end
   
-  def process_message(msg)
+  def parse_message(msg)
     # M1:M2:LED
-    m1, m2, led = msg.chomp.split(":")
+    m1, m2, led = msg.split(":")
     
     # ledy
     leds = (led.to_i >> 8).to_s(2).reverse.split(//)
     8.times {|i| @ground[i] = (leds[i] == "1") }
+    
+    
+    
+    # generate output
+    
+    out = []
+    
+    # switch
+    out << @switch1
+    out << @switch2
+    
+    @switch1 = 0 if @switch1 == 1
+    @switch2 = 0 if @switch2 == 1
+    
+    out.join(":")
+  end
+  
+  def switch1
+    @switch1 = 1
+  end
+  
+  def switch2
+    @switch2 = 1
   end
 end
 

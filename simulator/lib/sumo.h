@@ -254,6 +254,7 @@ unsigned char switch1_pressed();
 unsigned char switch2_pressed();
 void wait_switch1();
 void wait_switch2();
+extern unsigned char Switch[2];
 
 // lib/ground.cpp
 void ground_init();
