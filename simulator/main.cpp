@@ -17,6 +17,9 @@
 #include "lib/motor.h"
 #include "lib/queue.h"
 
+#include <iostream>
+	using namespace std;
+
 #define ITIME 50
 #define DEBUG 0
 #define WAIT 1000
@@ -31,7 +34,8 @@ void fikumiku(){
 	//o ile dobrze pamietam to motorow nie trzeba bylo zamieniac stronami
 	//bo czujniki nie sa zamieniane stronami, wiec wystarczy zamiana
 	//przod<->tyl
-	
+		
+		cout << "FIK" << endl;
 	front = !front;
 	motor[0].reverse = motor[1].reverse = front;
 	
@@ -76,6 +80,7 @@ unsigned char getGround(){
 	if (ground2_detected()) out*=(!front)?3:7; // przod prawy
 	if (ground3_detected()) out*=(!front)?5:2; // tyl lewy
 	if (ground4_detected()) out*=(!front)?7:3; // tyl prawy
+	cout << "front=" << (int)front << " out=" << (int)out << endl;
 	return out;
 }
  
@@ -107,12 +112,13 @@ void planEscape(unsigned char grd, char fp, char bp){
 			fikumiku();
 			led_set(255);
 		}
+		cout << "grd=" << (int)grd << endl;
 		switch(grd){
 			//default:
 			case 35: // tyl
-			case 6: // przod
+			case 6: // przod			
 				moveStraight(20, 3);
-				//stopMotor(10,3);
+				// stopMotor(10,3);
 				return;
 			
 			case 2: // przod lewy
@@ -287,7 +293,7 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(60);
+		motor[0].setPower(100);
 		motor[1].setPower(100);
 		/*
 		motor[0].stop();

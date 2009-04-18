@@ -31,6 +31,7 @@ void split(string str, string delim, vector<int> *results)
 string generateMessage(){
 	ostringstream msg;
 	// M1:M2
+	// cout << (int)motor[0].reverse << " " << (int)motor[0].getPower() << endl;
 	msg << (int)motor[0].getPower() << ":" << (int)motor[1].getPower() << ":" << led_state << endl;
 	return msg.str();
 }
@@ -41,9 +42,7 @@ void parseReply(string reply){
 	split(reply, ":", &items);
 	int i=0;
 	for(;i<2; i++) Switch[i] = items.at(i);
-	// for(int i=0; i<4; ++i){
-	// 	Ground[i] = items.at(i);
-	// }
+	for(;i<4; i++) Ground[i-2] = items.at(i);
 }
 
 void simulate(){
