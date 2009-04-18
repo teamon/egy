@@ -18,7 +18,7 @@
 #include "lib/queue.h"
 
 #define ITIME 50
-#define DEBUG 0
+#define DEBUG 1
 #define WAIT 1000
 
 Queue q;
@@ -142,6 +142,7 @@ void planEscape(unsigned char grd, char fp, char bp){
 
 void debug(){
 	progress();
+	return;
 	//send_ground_state_on_usart();
 	send_distance_state_on_usart();
 	
@@ -198,7 +199,6 @@ bool hold = false, hold2 = false;
 char strategia = 0;
 int power = 1;
 bool preLoop(){
-	simulate();
 	if (DEBUG){
 		usart_write_byte(0);
 		if (usart_read_byte() == '!'){
@@ -299,7 +299,7 @@ int main() {
 	
 	led_set(1);
 	
-	while(!preLoop()) wait_ms(ITIME);
+	// while(!preLoop()) wait_ms(ITIME);
 	led_set(0);
 	
 	q.clear();

@@ -239,6 +239,7 @@ void led7_off();
 void led8_on();
 void led8_off();
 void led_delay();
+extern unsigned int led_state;
 
 // lib/wait.cpp
 void wait_s(int s);

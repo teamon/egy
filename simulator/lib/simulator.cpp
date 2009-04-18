@@ -31,7 +31,7 @@ void split(string str, string delim, vector<int> *results)
 string generateMessage(){
 	ostringstream msg;
 	// M1:M2
-	msg << (int)motor[0].getPower() << ":" << (int)motor[1].getPower() << endl;
+	msg << (int)motor[0].getPower() << ":" << (int)motor[1].getPower() << ":" << led_state << endl;
 	return msg.str();
 }
 
