@@ -46,8 +46,30 @@ void stopMotor(int dist, char pri){
 	q.push(0, 0, dist, pri);
 }
 
-void setTurn(int rad, int angle, char pri){
-	
+Move turnPowers[] = {
+	{50, 0, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
+	{70, 20, 0, 1000} // jakis tam skret inny w prawo
+};
+
+void setTurn(int rad, float angle, char pri){
+	// ja bym tu nie kombinowal tylko ustalil doswiadczalnie kilka wartosci i radius zrobil jako kilka opcji typu: 
+	// 0(w miejscu), 1(ciasny), 2(troche szerszy), 3 .. itp. bo to przeliczanie VelToPow i odwrotnie jest raczej kiepskim rozwiazaniem ;]
+	// a jako angle czesc pelnego obrotu (po co sie jebac z pi)
+	// no i wygladaloby to wtedy jakos tak:
+	// turnPowers jako tablica elementow Move (left, right, time)
+	// left, right - wartosci mocy na silniki
+	// time = czas pelnego obrotu (to by trzeba w miare mozliwosci policzyc, wiem ze moze byc z tym problem ;p ale moze da sie policzyc np czas 10 obrotow i wtedy podzielic to powinno byc lepsze przyblizenie)
+	// no i angle tak jak w pazdzierzu jak dodatnie to w prawo, jak ujemne to w lewo(czyli zamieniamy powery)
+	// i na koncu byloby tylko
+	Move m = turnPowers[rad];
+	if(angle < 0){
+		char p = m.left;
+		m.left = m.right;
+		m.right = m.left;
+	}
+	m.time *= abs(angle);
+	m.pri = pri;
+	q.push(m);
 }
 
 void unik(char pri){
@@ -108,6 +130,7 @@ void planEscape(unsigned char grd, char fp, char bp){
 			led_set(255);
 		}
 		switch(grd){
+			// czy jak zobaczy z przodu to zawsze dajemy fikumiku? (chyba tak bedzie wygodniej)
 			//default:
 			case 35: // tyl
 			case 6: // przod
@@ -117,23 +140,25 @@ void planEscape(unsigned char grd, char fp, char bp){
 			
 			case 2: // przod lewy
 			case 5: // tyl lewy
-				stopMotor(10,3);
+				// stopMotor(10, 3);
 				//moveStraight(20, 3);
+				setTurn(1, 0.125, 3); // skret o 45 stopni w prawo
 				return;
 			
 			case 3: // przod prawy
 			case 7: // tyl prawy
-				stopMotor(10,3);
+				// stopMotor(10, 3);
 				//moveStraight(20, 3);
+				setTurn(1, -0.125, 3); // skret o 45 stopni w lewo
 				return;
 				
 			case 10: // lewo
-				stopMotor(10,3);
+				stopMotor(10, 3);
 				//moveStraight(20, 3);
 				return;
 				
 			case 21: // prawo
-				stopMotor(10,3);
+				stopMotor(10, 3);
 				//moveStraight(20, 3);
 				return;
 		}
