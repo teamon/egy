@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+require "optparse"
+
+LIBS = Dir["lib/*.cpp"]
+
+options = {}
+OptionParser.new do |o|
+	o.banner = "Usage: ./rmake [options] [name]"
+	o.on("-m", "Make") {|v| options[:make] = v }
+	o.on("-r", "Remove .elf, .hex, .o") {|v| options[:remove] = v}
+end.parse!
+
+options[:program] = options[:make] = options[:verify] = true if options.empty?
+
+if options[:remove]
+	print "Removing..."
+	["elf", "hex", "o"].each do |ext| 
+		Dir["**/*.#{ext}"].each do |f| 
+			print f + " "
+			File.delete(f)
+		end
+	end
+	puts "done."
+end
+
+progname = ARGV.first.sub('.cpp', '')
+
+makefile_libs = LIBS.map do |name|
+	name = name.split('.').first
+	"#{name}: #{name}.cpp"
+end.join("\n")
+
+libs = LIBS.map do |name|
+  name = name.split('.').first
+	"#{name}.o"
+end.join(" ")
+
+makefile = <<-MAKEFILE
+
+all: #{progname}
+
+#{progname}: #{libs} #{progname}.o
+	g++ -o #{progname} #{libs} #{progname}.o
+	
+#{makefile_libs}
+	
+clean:
+	rm -f *.o
+
+MAKEFILE
+
+if options[:make]
+	File.open('Makefile', 'w') do |f|
+		f.puts makefile
+	end
+	make_output = `make 2>&1`
+	puts make_output
+end
+
