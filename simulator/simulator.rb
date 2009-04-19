@@ -32,7 +32,7 @@ class Robot
   
   def move
     t = 0.1
-    diff = @m2 - @m1
+    diff = (@m2 - @m1).to_f
     
     if diff == 0
       s = @m1*t
