@@ -38,12 +38,16 @@ void fikumiku(){
 	q.clear();
 }
 
-void moveStraight(int dist, char pri){
-	q.push(100, 100, dist, pri);
+void moveStraight(int time, char pri){
+	q.push(100, 100, time, pri);
 }
 
-void stopMotor(int dist, char pri){
-	q.push(0, 0, dist, pri);
+void stopMotor(int time, char pri){
+	if (dist<0){
+		motor[0].setPower(0);
+		motor[1].setPower(0);
+	}
+	q.push(0, 0, time, pri);
 }
 
 Move turnPowers[] = {
@@ -180,27 +184,6 @@ void debug(){
 				fikumiku();
 				break;
 		}
-		/*
-		else if (c == '~'){ //motor
-			char lp = usart_read_byte();
-			char sign_c = usart_read_byte();
-			char sign;
-			switch (sign_c){
-				case 'f':
-					sign = 1;
-					break;
-				case 'b':
-					sign = -1;
-					break;
-				case 'n':
-					sign=0;
-					break;
-			}
-			char power = usart_read_byte();
-			power *= sign;
-			SetMotor(lp, power);
-		}*/
-		
 		c = usart_read_byte();
 	}
 }
@@ -223,37 +206,42 @@ bool hold = false, hold2 = false;
 char strategia = 0;
 int power = 1;
 bool preLoop(){
-	if (DEBUG){
-		usart_write_byte(0);
-		if (usart_read_byte() == '!'){
-			led_set(255);
-			usart_write_progmem_string(PSTR("Bonjour\n"));
-			return true;
-		}
-	}//else {
 	if (switch1_pressed() && !hold){
-		odliczanie = !odliczanie;
-		ticks = 0;
+		//test silnikow
 		hold = true;
-	}else if(!switch1_pressed()){
+		
+	}else if(!switch1_pressed() && hold){
 		hold = false;
+		led_set(1<<(power-1));
+		motor[0].setPower(power*10);
+		motor[1].setPower(10*power++);
+		while(getGround()!=6){ progress(); }
+		fikumiku();
+		motor[0].setPower(0);
+		motor[1].setPower(0);
+		led_set(255);
 	}
 	
 	if (switch2_pressed() && !hold2){
+		//zakrety
 		strategia ++;
-		if (strategia>7) strategia = 0;
-		led_set(1<<strategia);
-		
-		odliczanie = false;
 		hold2 = true;
-	}else if (!switch2_pressed())
+	}else if (!switch2_pressed() && hold2){
+		led_set(1<<(strategia-1));
 		hold2 = false;
+		float angle = .25;
+		setTurn(strategia*5, angle, 0);	
+		unsigned char g = 1;
+		while (!q.empty() && g%2 == 0 && g%3 == 0){
+			motor[0].setPower(q.front()->left);
+			motor[1].setPower(q.front()->right);
+			q.dec(1);
+			g = getGround();
+		}
+		fikumiku();
+		led_set(255);
+	}
 
-	ticks += odliczanie;
-	if (ticks >= WAIT/ITIME) return true;
-	if (odliczanie)
-		led_set(1<<(5-ticks*5*ITIME/WAIT));
-	//}
 	return false;
 }
 
