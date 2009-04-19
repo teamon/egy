@@ -215,7 +215,10 @@ bool preLoop(){
 		led_set(1<<(power-1));
 		motor[0].setPower(power*10);
 		motor[1].setPower(10*power++);
-		while(getGround()!=6){ progress(); }
+		int czas = 0;
+		while(getGround()!=6){ progress(); wait_ms(ITIME);czas++;}
+		usart_write_number(czas);
+		usart_write_byte('\n');
 		fikumiku();
 		motor[0].setPower(0);
 		motor[1].setPower(0);
@@ -232,12 +235,17 @@ bool preLoop(){
 		float angle = .25;
 		setTurn(strategia*5, angle, 0);	
 		unsigned char g = 1;
+		int czas = 0;
 		while (!q.empty() && g%2 == 0 && g%3 == 0){
 			motor[0].setPower(q.front()->left);
 			motor[1].setPower(q.front()->right);
 			q.dec(1);
 			g = getGround();
+			wait_ms(ITIME);
+			czas++;
 		}
+		usart_write_number(czas);
+		usart_write_byte('\n');
 		fikumiku();
 		led_set(255);
 	}
