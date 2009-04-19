@@ -1,11 +1,25 @@
 require 'ruby-processing'
 require 'socket'
 
+K = 1 # skalowanie 
 D = 100
+
 include Math
 
+
+class Button
+  attr_accessor :x, :y, :width, :height, :pressed, :label
+  def initialize(x, y, width, height, label)
+    @x, @y, @width, @height, @label = x, y, width, height, label
+  end
+  
+  def update(mouse_x, mouse_y)
+    @pressed = (mouse_x >= @x && mouse_x <= @x+@width && mouse_y >= @y && mouse_y <= @y+@height)
+  end
+end
+
 class Robot
-  attr_accessor :x, :y, :m1, :m2, :angle, :history, :coords
+  attr_accessor :x, :y, :m1, :m2, :angle, :history, :coords, :grounds
   
   def initialize
     # @x, @y = 60, -50
@@ -13,11 +27,11 @@ class Robot
     @m1, @m2 = 0, 0
     @angle = PI/2
     @history = []
+    @grounds = []
   end    
   
   def move
     t = 0.1
-    
     diff = @m2 - @m1
     
     if diff == 0
@@ -27,6 +41,7 @@ class Robot
     else
       beta = diff * t / D
       r = ((@m1 / diff)) * D
+      r += D/2
       
       @x += -r * (cos(@angle) - cos(@angle + beta))
       @y += r * (sin(@angle + beta) - sin(@angle))
@@ -35,10 +50,11 @@ class Robot
     end
     
     refresh_coords
+    on_line
   end
   
   def on_line
-    @coords.map {|e| touch_line?(e.first, e.last) ? 1 : 0 }
+    @grounds = @coords.map {|e| touch_line?(e.first, e.last) ? 1 : 0 }
   end
   
   def touch_line?(x, y)
@@ -63,80 +79,103 @@ end
 class Simulator < Processing::App
   load_ruby_library "control_panel" 
   
+  def mouse_pressed
+    (@switch + [@reset_button]).each {|s| s.update(mouse_x, mouse_y)}
+    
+    if @reset_button.pressed
+      # reset
+      setup
+      
+      @reset_button.pressed = false
+    end
+  end
+  
   def setup
-    @server = Thread.new { 
-      setup_server 
-    }
+    textAlign(LEFT) 
+    smooth
+    @server = Thread.new { setup_server }
     color_mode RGB, 1.0
     frame_rate 30
-    
     no_stroke
-    
     @font = load_font "QuicksandBook.vlw"
-    textFont @font, 20
+    textFont @font, K*20
     
     draw_ring    
     
     # menusy
     fill 0.4
-    rect 800, 0, 200, 800
-    
-    control_panel do |c|
-      c.button :switch1
-      c.button :switch2
-    end
+    rect K*800, 0, K*200, K*800
     
     # ledy
     fill 0.9
-    text "LED", 820, 30
-    
+    text "LED", K*820, K*30
+    text "SWITCH", K*820, K*100
     
     @led = []
-    @switch1, @switch2 = 0, 0
+    @switch = [
+      Button.new(K*820, K*110, K*70, K*40, "SW1"),
+      Button.new(K*900, K*110, K*70, K*40, "SW2")
+    ]
+    @reset_button = Button.new(K*820, K*160, K*150, K*40, "RESET")
     
     @robot = Robot.new
     @robot.refresh_coords
           
-    text_size 15
+    text_size K*15
   end
   
   def draw_ring
     fill 0.3
-    rect 0, 0, 800, 800
+    rect 0, 0, K*800, K*800
     fill 0.9
-    ellipse 400, 400, 770, 770
+    ellipse K*400, K*400, K*770, K*770
     fill 0
-    ellipse 400, 400, 720, 720
+    ellipse K*400, K*400, K*720, K*720
     fill 0.1
-    rect 450, 350, 10, 100
-    rect 340, 350, 10, 100
+    rect K*450, K*350, K*10, K*100
+    rect K*340, K*350, K*10, K*100
   end
   
   def draw
+    # guziki
+    stroke 0.5
+    textAlign(CENTER)
+    (@switch + [@reset_button]).each {|s| 
+      fill(s.pressed ? 0xFF57bd23 : 0.3)
+      rect s.x, s.y, s.width, s.height
+      fill 0.7
+      text s.label, s.x+s.width/2, s.y+s.height/2+K*6
+    }
+    no_stroke
     
     # ledy
     8.times {|i|
       fill @led[i] ? 0xFF57bd23 : 0.3
-      text (i+1).to_s, 820 + i*20, 60
+      text (i+1).to_s, K*(820 + i*20), K*60
     }
     
     draw_ring
     
+    # linia sledzaca
     fill 0.15
-    @robot.history.each {|x,y| ellipse 400+x, 400-y, 3, 3 }
+    @robot.history.each {|x,y| ellipse K*(400+x), K*(400-y), K*3, K*3 }
     
-    fill 0xFFFF0000
-    c = @robot.coords.map{|x| 
-      [x.first+400, 400-x.last]
-    }
-    quad *[c[0], c[1], c[3], c[2]].flatten
+    # robot
+
     
+    # groundy
+    fill 0xFF0FF900
     @robot.coords.each_with_index do |e, i|
       # fill 1
       # text i.to_s, 400+e.first, 400-e.last
-      fill(@robot.touch_line?(e.first, e.last) ? 0xFF0FF900 : 0xFF000000)
-      ellipse(400+e.first, 400-e.last, 10, 10)
+      if @robot.grounds[i]==1
+        ellipse(K*(400+e.first), K*(400-e.last), K*20, K*20)
+      end
     end
+    
+    fill 0xFFFF0000
+    c = @robot.coords.map{|x| [K*(x.first+400), K*(400-x.last)] }
+    quad *[c[0], c[1], c[3], c[2]].flatten
   end
 
   def setup_server
@@ -167,35 +206,24 @@ class Simulator < Processing::App
     # motorky
     @robot.m1 = m1
     @robot.m2 = m2
-    
-    @robot.move
-    
-    
-    
+    @robot.move   
+     
     # output
     out = []
     
     # switch
-    out << @switch1
-    out << @switch2
-    out += @robot.on_line
-    # @robot.on_line
+    @switch.each do |s|
+      if s.pressed
+        out << 1
+        s.pressed = false
+      else
+        out << 0
+      end
+    end
     
-    @switch1 = 0 if @switch1 == 1
-    @switch2 = 0 if @switch2 == 1
-    
+    out += @robot.grounds
     out.join(":")
-  end
-  
-  def switch1
-    @switch1 = 1
-  end
-  
-  def switch2
-    @switch2 = 1
   end
 end
 
-
-Simulator.new :title => 'Egy simulator', :width => 1000, :height => 800
-
+Simulator.new :title => 'Egy simulator', :width => K*1000, :height => K*800
