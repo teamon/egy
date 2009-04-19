@@ -1,11 +1,10 @@
 require 'ruby-processing'
 require 'socket'
 
-K = 1 # skalowanie 
+K = 0.9 # skalowanie (bo mi sie na macy nie miesci calosc :P)
 D = 100
 
 include Math
-
 
 class Button
   attr_accessor :x, :y, :width, :height, :pressed, :label
@@ -22,7 +21,6 @@ class Robot
   attr_accessor :x, :y, :m1, :m2, :angle, :history, :coords, :grounds
   
   def initialize
-    # @x, @y = 60, -50
     @x, @y = 110, 0
     @m1, @m2 = 0, 0
     @angle = PI/2
@@ -62,16 +60,17 @@ class Robot
   end
   
   def refresh_coords
-    a = D * cos(@angle)
-    b = D * sin(@angle)
-  
     @history << [@x, @y]
+    @history.shift if @history.size > 3000
+
+    a = D * cos(@angle) / 2
+    b = D * sin(@angle) / 2
 
     @coords = [
-      [@x-(a+b)/2,    @y-(b-a)/2],
-      [@x+(a-b)/2,    @y+(a+b)/2],
-      [@x+(b-a)/2,    @y-(a+b)/2],
-      [@x+(a+b)/2,    @y+(b-a)/2]
+      [@x-a-b,  @y+a-b],
+      [@x+a-b,  @y+a+b],
+      [@x-a+b,  @y-a-b],
+      [@x+a+b,  @y-a+b]
     ]
   end
 end
@@ -120,8 +119,9 @@ class Simulator < Processing::App
     
     @robot = Robot.new
     @robot.refresh_coords
-          
+
     text_size K*15
+    textAlign(CENTER)
   end
   
   def draw_ring
@@ -139,7 +139,6 @@ class Simulator < Processing::App
   def draw
     # guziki
     stroke 0.5
-    textAlign(CENTER)
     (@switch + [@reset_button]).each {|s| 
       fill(s.pressed ? 0xFF57bd23 : 0.3)
       rect s.x, s.y, s.width, s.height
@@ -159,10 +158,7 @@ class Simulator < Processing::App
     # linia sledzaca
     fill 0.15
     @robot.history.each {|x,y| ellipse K*(400+x), K*(400-y), K*3, K*3 }
-    
-    # robot
 
-    
     # groundy
     fill 0xFF0FF900
     @robot.coords.each_with_index do |e, i|
@@ -173,9 +169,28 @@ class Simulator < Processing::App
       end
     end
     
+    # robot
     fill 0xFFFF0000
     c = @robot.coords.map{|x| [K*(x.first+400), K*(400-x.last)] }
     quad *[c[0], c[1], c[3], c[2]].flatten
+    
+    # robot po prawej    
+    fill 0xFFFF0000
+    rect K*850, K*300, K*D, K*D
+    fill 0
+    rect K*850, K*330, K*40, K*40
+    rect K*910, K*330, K*40, K*40
+    fill 0.7
+    text @robot.m1, K*870, K*355
+    text @robot.m2, K*930, K*355
+    
+    # groundy po prawej
+    fill 0xFF0FF900
+    @robot.coords.each_with_index do |e, i|
+      if @robot.grounds[i]==1
+        rect K*(850+(i%2)*80), K*(300+i/2*80), K*20, K*20
+      end
+    end
   end
 
   def setup_server
