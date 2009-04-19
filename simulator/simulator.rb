@@ -8,14 +8,15 @@ class Robot
   attr_accessor :x, :y, :m1, :m2, :angle, :history, :coords
   
   def initialize
-    @x, @y = 60, -50
+    # @x, @y = 60, -50
+    @x, @y = 110, 0
     @m1, @m2 = 0, 0
     @angle = PI/2
     @history = []
   end    
   
   def move
-    t = 0.05
+    t = 0.1
     
     diff = @m2 - @m1
     
@@ -48,13 +49,13 @@ class Robot
     a = D * cos(@angle)
     b = D * sin(@angle)
   
-    @history << [@x+(a/2), @y-(b/2)]
-      
+    @history << [@x, @y]
+
     @coords = [
-      [@x,     @y], 
-      [@x+a,   @y+b],
-      [@x+b,   @y-a],
-      [@x+a+b, @y+b-a]
+      [@x-(a+b)/2,    @y-(b-a)/2],
+      [@x+(a-b)/2,    @y+(a+b)/2],
+      [@x+(b-a)/2,    @y-(a+b)/2],
+      [@x+(a+b)/2,    @y+(b-a)/2]
     ]
   end
 end
@@ -108,7 +109,7 @@ class Simulator < Processing::App
     ellipse 400, 400, 720, 720
     fill 0.1
     rect 450, 350, 10, 100
-    rect 350, 350, 10, 100
+    rect 340, 350, 10, 100
   end
   
   def draw
@@ -122,7 +123,7 @@ class Simulator < Processing::App
     draw_ring
     
     fill 0.15
-    @robot.history.each {|x,y| ellipse x, y, 3, 3 }
+    @robot.history.each {|x,y| ellipse 400+x, 400-y, 3, 3 }
     
     fill 0xFFFF0000
     c = @robot.coords.map{|x| 
@@ -130,9 +131,11 @@ class Simulator < Processing::App
     }
     quad *[c[0], c[1], c[3], c[2]].flatten
     
-    @robot.coords.each do |x,y|
-      fill(@robot.touch_line?(x, y) ? 0xFF0FF900 : 0xFF000000)
-      ellipse(400+x, 400-y, 10, 10)
+    @robot.coords.each_with_index do |e, i|
+      # fill 1
+      # text i.to_s, 400+e.first, 400-e.last
+      fill(@robot.touch_line?(e.first, e.last) ? 0xFF0FF900 : 0xFF000000)
+      ellipse(400+e.first, 400-e.last, 10, 10)
     end
   end
 

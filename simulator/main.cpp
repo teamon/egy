@@ -118,12 +118,11 @@ void planEscape(unsigned char grd, char fp, char bp){
 				return;
 			
 			case 2: // przod lewy
-			case 5: // tyl lewy
-				stopMotor(10,3);
-				//moveStraight(20, 3);
-				return;
-			
 			case 3: // przod prawy
+				moveStraight(20, 3); // to powinno dzialac (w teori)
+				return;
+				
+			case 5: // tyl lewy
 			case 7: // tyl prawy
 				stopMotor(10,3);
 				//moveStraight(20, 3);
@@ -289,7 +288,7 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(100);
+		motor[0].setPower(80);
 		motor[1].setPower(100);
 		/*
 		motor[0].stop();
