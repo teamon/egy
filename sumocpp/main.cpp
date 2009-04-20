@@ -63,15 +63,6 @@ Move turnPowers[] = {
 };
 
 void setTurn(char rad, float angle, char pri){
-	// ja bym tu nie kombinowal tylko ustalil doswiadczalnie kilka wartosci i radius zrobil jako kilka opcji typu: 
-	// 0(w miejscu), 1(ciasny), 2(troche szerszy), 3 .. itp. bo to przeliczanie VelToPow i odwrotnie jest raczej kiepskim rozwiazaniem ;]
-	// a jako angle czesc pelnego obrotu (po co sie jebac z pi)
-	// no i wygladaloby to wtedy jakos tak:
-	// turnPowers jako tablica elementow Move (left, right, time)
-	// left, right - wartosci mocy na silniki
-	// time = czas pelnego obrotu (to by trzeba w miare mozliwosci policzyc, wiem ze moze byc z tym problem ;p ale moze da sie policzyc np czas 10 obrotow i wtedy podzielic to powinno byc lepsze przyblizenie)
-	// no i angle tak jak w pazdzierzu jak dodatnie to w prawo, jak ujemne to w lewo(czyli zamieniamy powery)
-	// i na koncu byloby tylko
 	Move m = turnPowers[rad];
 	if(angle < 0){
 		char p = m.left;
@@ -89,18 +80,21 @@ void unik(char pri){
 	bool ktorym = 0;
 	int wyn = motor[0].getPower()*motor[1].getPower();
 	if (wyn > 0){
-		ktorym = (Dist[front][0] > Dist[front][1]);//jezeli jest
+		ktorym = (Dist[front][0] > Dist[front][1] && front == 0);//jezeli jest
 		//szansa ze z jednej strony nic nie ma to zatrzymaj ten motor
 	}else if (wyn == 0){
 		//wybierz ten z mniejsza moca (czyli ten z zerem)
-		ktorym = (mabs(motor[0].getPower())>mabs(motor[1].getPower()));
+		ktorym = (mabs(motor[0].getPower())>mabs(motor[1].getPower())) && front == 0;
 	}else{
 		//wybierz ten z wieksza moca (czyli dodatni)
-		ktorym = (motor[0].getPower()<motor[1].getPower());
+		ktorym = (motor[0].getPower()<motor[1].getPower() && front==0);
 	}
 	
 	//jeden z silnikow sie zatrzyma, 2 pojedzie do tylu
-	q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);
+	//q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);
+	fikumiku();
+	setTurn(oneWheel, .75*((ktorym)?-1:1), 3);
+	//tu by sie moglo przydac wrzucanie fikumiku na kolejke?
 }
 
 unsigned char getGround(){
@@ -113,12 +107,12 @@ unsigned char getGround(){
 }
  
 char getProbe(bool side){
-	if (!inrange(Dist[side][2], 120, 140)){ //zakres dla ringu
-		if (!inrange(Dist[side][0], 20, 70)
-		&& !inrange(Dist[side][1], 20, 70)){ //nic nie ma z przodu więc kres
-			return 1; //koniec ringu
-		}else{
+	if (!inrange(Dist[side][2], 110, 120)){ //zakres dla ringu
+		if (inrange(Dist[side][2], 0, 100)
+		{ //nic nie ma z przodu więc kres
 			return 2; //zwarcie
+		}else{
+			return 1; //koniec ringu
 		}
 	}
 	return 0;
@@ -215,6 +209,42 @@ void klapy(){
 	clr(SERVO2_PORT, SERVO2_PIN);
 }
 
+struct ValAndDist{
+	char dist;
+	int val;
+};
+
+ValAndDist values[] = {
+{10, 120},
+{15, 87},
+{20, 70},
+{25, 55},
+{30, 50},
+{35, 40},
+{40, 35},
+{45, 30},
+{-1, 29}};
+
+const char valuesLen = 9;
+
+char getDistance(int value, char probe){
+	if (value < 30) return -1;
+	if (probe == 2) return 0;
+	
+	char n = valuesLen, left = 0;
+	for(;;){
+		int center = (left + n)/2;
+		if (values[center].val == value || n-left < 2){
+			return values[center].dist;
+		}else if (values[center].val < val){
+			n = center;
+		}else{
+			left = center;
+		}
+	}
+	return -1;
+}
+
 unsigned char ticks = 0;
 bool odliczanie = false;
 bool hold = false, hold2 = false;
@@ -257,18 +287,21 @@ bool preLoop(){
 
 void loop(){
 	kalmanize();
-	unsigned char ground = getGround();
 	
 	if(DEBUG){
 		debug();
 		return;
 	}
+	
 	int pri = 0;
 	if (!q.empty()){
 		pri = q.front()->pri;
 		//led_set(pri);
 	}
-			
+	
+	char fProbe = 0;
+	char bProbe = 0;
+	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
