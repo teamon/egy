@@ -108,7 +108,7 @@ unsigned char getGround(){
  
 char getProbe(bool side){
 	if (!inrange(Dist[side][2], 110, 120)){ //zakres dla ringu
-		if (inrange(Dist[side][2], 0, 100)
+		if ( Dist[side][2] < 110)
 		{ //nic nie ma z przodu więc kres
 			return 2; //zwarcie
 		}else{
