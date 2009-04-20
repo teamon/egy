@@ -17,7 +17,7 @@
 #include "lib/motor.h"
 #include "lib/queue.h"
 
-#define ITIME 50
+#define ITIME 20
 #define DEBUG 0
 #define WAIT 1000
 
@@ -50,9 +50,9 @@ void stopMotor(int time, char pri){
 	q.push(0, 0, time, pri);
 }
 
-Move turnPowers[] = {
-	{50, 0, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
-	{70, 20, 0, 1000} // jakis tam skret inny w prawo
+int turnPowers[][3] = {
+	{50, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
+	{70, 20, 1000} // jakis tam skret inny w prawo
 };
 
 void setTurn(int rad, float angle, char pri){
@@ -65,13 +65,16 @@ void setTurn(int rad, float angle, char pri){
 	// time = czas pelnego obrotu (to by trzeba w miare mozliwosci policzyc, wiem ze moze byc z tym problem ;p ale moze da sie policzyc np czas 10 obrotow i wtedy podzielic to powinno byc lepsze przyblizenie)
 	// no i angle tak jak w pazdzierzu jak dodatnie to w prawo, jak ujemne to w lewo(czyli zamieniamy powery)
 	// i na koncu byloby tylko
-	Move m = turnPowers[rad];
+	Move m;
+	m.left = turnPowers[rad][0];
+	m.right = turnPowers[rad][1];
+	m.time = turnPowers[rad][2]
 	if(angle < 0){
 		char p = m.left;
 		m.left = m.right;
 		m.right = m.left;
 	}
-	m.time *= abs(angle);
+	m.time *= mabs(angle);
 	m.pri = pri;
 	q.push(m);
 }
@@ -204,8 +207,9 @@ unsigned char ticks = 0;
 bool odliczanie = false;
 bool hold = false, hold2 = false;
 char strategia = 0;
-int power = 1;
+int power = 8;
 bool preLoop(){
+	led_set(getGround());
 	if (switch1_pressed() && !hold){
 		//test silnikow
 		hold = true;
@@ -215,11 +219,14 @@ bool preLoop(){
 		led_set(1<<(power-1));
 		motor[0].setPower(power*10);
 		motor[1].setPower(10*power++);
-		int czas = 0;
-		while(getGround()!=6){ progress(); wait_ms(ITIME);czas++;}
+		int czas = 0; 
+		while(getGround()%2!=0 && getGround()%3!=0){ wait_ms(ITIME);czas++;}
 		usart_write_number(czas);
 		usart_write_byte('\n');
 		fikumiku();
+		motor[0].setPower(80);
+		motor[1].setPower(80);
+		wait_ms(500);
 		motor[0].setPower(0);
 		motor[1].setPower(0);
 		led_set(255);
@@ -232,11 +239,12 @@ bool preLoop(){
 	}else if (!switch2_pressed() && hold2){
 		led_set(1<<(strategia-1));
 		hold2 = false;
-		float angle = .25;
-		setTurn(strategia*5, angle, 0);	
+		float angle = 0.25;
+		setTurn(1, angle*strategia, 0);	
 		unsigned char g = 1;
 		int czas = 0;
-		while (!q.empty() && g%2 == 0 && g%3 == 0){
+		while (!q.empty()){
+			progress();
 			motor[0].setPower(q.front()->left);
 			motor[1].setPower(q.front()->right);
 			q.dec(1);
@@ -244,10 +252,16 @@ bool preLoop(){
 			wait_ms(ITIME);
 			czas++;
 		}
+		led_set(255);
 		usart_write_number(czas);
 		usart_write_byte('\n');
 		fikumiku();
-		led_set(255);
+		motor[0].setPower(80);
+		motor[1].setPower(80);
+		wait_ms(500);
+		motor[0].setPower(0);
+		motor[1].setPower(0);
+		
 	}
 
 	return false;
