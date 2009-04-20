@@ -17,8 +17,9 @@
 #include "lib/motor.h"
 #include "lib/queue.h"
 
-#define ITIME 50
-#define DEBUG 1
+
+#define ITIME 20
+#define DEBUG 0
 #define WAIT 1000
 
 Queue q;
@@ -38,20 +39,29 @@ void fikumiku(){
 	q.clear();
 }
 
-void moveStraight(int dist, char pri){
-	q.push(100, 100, dist, pri);
+void moveStraight(int time, char pri){
+	q.push(100, 100, time, pri);
 }
 
-void stopMotor(int dist, char pri){
-	q.push(0, 0, dist, pri);
+void stopMotor(int time, char pri){
+	if (dist<0){
+		motor[0].setPower(0);
+		motor[1].setPower(0);
+	}
+	q.push(0, 0, time, pri);
 }
+
+const char inPlace = 0;
+const char oneWheel = 1;
+const char lightTurn = 2;
 
 Move turnPowers[] = {
-	{50, 0, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
-	{70, 20, 0, 1000} // jakis tam skret inny w prawo
+	{100, -100, 0, 1400/ITIME}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
+	{100, 0, 0, 2500/ITIME}, // jakis tam skret inny w prawo
+	{100, 60, 0, 4000/ITIME}
 };
 
-void setTurn(int rad, float angle, char pri){
+void setTurn(char rad, float angle, char pri){
 	// ja bym tu nie kombinowal tylko ustalil doswiadczalnie kilka wartosci i radius zrobil jako kilka opcji typu: 
 	// 0(w miejscu), 1(ciasny), 2(troche szerszy), 3 .. itp. bo to przeliczanie VelToPow i odwrotnie jest raczej kiepskim rozwiazaniem ;]
 	// a jako angle czesc pelnego obrotu (po co sie jebac z pi)
@@ -65,9 +75,9 @@ void setTurn(int rad, float angle, char pri){
 	if(angle < 0){
 		char p = m.left;
 		m.left = m.right;
-		m.right = m.left;
+		m.right = p;
 	}
-	m.time *= abs(angle);
+	m.time = int(mabs(angle)*m.time);
 	m.pri = pri;
 	q.push(m);
 }
@@ -180,27 +190,6 @@ void debug(){
 				fikumiku();
 				break;
 		}
-		/*
-		else if (c == '~'){ //motor
-			char lp = usart_read_byte();
-			char sign_c = usart_read_byte();
-			char sign;
-			switch (sign_c){
-				case 'f':
-					sign = 1;
-					break;
-				case 'b':
-					sign = -1;
-					break;
-				case 'n':
-					sign=0;
-					break;
-			}
-			char power = usart_read_byte();
-			power *= sign;
-			SetMotor(lp, power);
-		}*/
-		
 		c = usart_read_byte();
 	}
 }
@@ -238,12 +227,12 @@ bool preLoop(){
 	}else if(!switch1_pressed()){
 		hold = false;
 	}
-	
+
 	if (switch2_pressed() && !hold2){
 		strategia ++;
 		if (strategia>7) strategia = 0;
 		led_set(1<<strategia);
-		
+        
 		odliczanie = false;
 		hold2 = true;
 	}else if (!switch2_pressed())
