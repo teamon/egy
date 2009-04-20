@@ -50,12 +50,17 @@ void stopMotor(int time, char pri){
 	q.push(0, 0, time, pri);
 }
 
+const char inPlace = 0;
+const char oneWheel = 1;
+const char lightTurn = 2;
+
 Move turnPowers[] = {
-	{50, 0, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
-	{70, 20, 0, 1000} // jakis tam skret inny w prawo
+	{100, -100, 0, 1400/ITIME}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
+	{100, 0, 0, 2500/ITIME}, // jakis tam skret inny w prawo
+	{100, 60, 0, 4000/ITIME}
 };
 
-void setTurn(int rad, float angle, char pri){
+void setTurn(char rad, float angle, char pri){
 	// ja bym tu nie kombinowal tylko ustalil doswiadczalnie kilka wartosci i radius zrobil jako kilka opcji typu: 
 	// 0(w miejscu), 1(ciasny), 2(troche szerszy), 3 .. itp. bo to przeliczanie VelToPow i odwrotnie jest raczej kiepskim rozwiazaniem ;]
 	// a jako angle czesc pelnego obrotu (po co sie jebac z pi)
@@ -69,9 +74,9 @@ void setTurn(int rad, float angle, char pri){
 	if(angle < 0){
 		char p = m.left;
 		m.left = m.right;
-		m.right = m.left;
+		m.right = p;
 	}
-	m.time = (int)mabs(angle)*m.time;
+	m.time = int(mabs(angle)*m.time);
 	m.pri = pri;
 	q.push(m);
 }
@@ -236,8 +241,8 @@ bool preLoop(){
 	}else if (!switch2_pressed() && hold2){
 		led_set(1<<(strategia-1));
 		hold2 = false;
-		float angle = 0.25;
-		setTurn(1, angle*strategia, 0);	
+		float angle = -.75;
+		setTurn(1, angle, 0);	
 		unsigned char g = 1;
 		int czas = 0;
 		while (!q.empty()){
