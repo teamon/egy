@@ -50,9 +50,9 @@ void stopMotor(int time, char pri){
 	q.push(0, 0, time, pri);
 }
 
-int turnPowers[][3] = {
-	{50, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
-	{70, 20, 1000} // jakis tam skret inny w prawo
+Move turnPowers[] = {
+	{50, 0, 0, 1000}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
+	{70, 20, 0, 1000} // jakis tam skret inny w prawo
 };
 
 void setTurn(int rad, float angle, char pri){
@@ -65,16 +65,13 @@ void setTurn(int rad, float angle, char pri){
 	// time = czas pelnego obrotu (to by trzeba w miare mozliwosci policzyc, wiem ze moze byc z tym problem ;p ale moze da sie policzyc np czas 10 obrotow i wtedy podzielic to powinno byc lepsze przyblizenie)
 	// no i angle tak jak w pazdzierzu jak dodatnie to w prawo, jak ujemne to w lewo(czyli zamieniamy powery)
 	// i na koncu byloby tylko
-	Move m;
-	m.left = turnPowers[rad][0];
-	m.right = turnPowers[rad][1];
-	m.time = turnPowers[rad][2]
+	Move m = turnPowers[rad];
 	if(angle < 0){
 		char p = m.left;
 		m.left = m.right;
 		m.right = m.left;
 	}
-	m.time *= mabs(angle);
+	m.time = (int)mabs(angle)*m.time;
 	m.pri = pri;
 	q.push(m);
 }
