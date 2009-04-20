@@ -18,7 +18,7 @@
 #include "lib/queue.h"
 
 #define ITIME 50
-#define DEBUG 0
+#define DEBUG 1
 #define WAIT 1000
 
 Queue q;
