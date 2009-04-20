@@ -19,7 +19,7 @@
 
 
 #define ITIME 20
-#define DEBUG 0
+#define DEBUG 1
 #define WAIT 1000
 
 Queue q;
@@ -39,8 +39,9 @@ void fikumiku(){
 	q.clear();
 }
 
+//2100 - caly ring
 void moveStraight(int time, char pri){
-	q.push(100, 100, time, pri);
+	q.push(100, 100, time/ITIME, pri);
 }
 
 void stopMotor(int time, char pri){
@@ -137,39 +138,34 @@ void planEscape(unsigned char grd, char fp, char bp){
 	}else{
 		if (grd%2==0 || grd%3==0){
 			fikumiku();
-			led_set(255);
 		}
 		switch(grd){
-			// czy jak zobaczy z przodu to zawsze dajemy fikumiku? (chyba tak bedzie wygodniej)
-			//default:
 			case 35: // tyl
 			case 6: // przod
-				moveStraight(20, 3);
-				//stopMotor(10,3);
+				moveStraight(400, 3);
+				setTurn(oneWheel, .25, 2);
 				return;
 			
 			case 2: // przod lewy
 			case 5: // tyl lewy
-				// stopMotor(10, 3);
-				//moveStraight(20, 3);
-				setTurn(1, 0.125, 3); // skret o 45 stopni w prawo
+				setTurn(lightTurn, .125, 3); // skret o 45 stopni w prawo
+				moveStraight(200, 3);
 				return;
 			
 			case 3: // przod prawy
 			case 7: // tyl prawy
-				// stopMotor(10, 3);
-				//moveStraight(20, 3);
-				setTurn(1, -0.125, 3); // skret o 45 stopni w lewo
+				setTurn(lightTurn, -.125, 3); // skret o 45 stopni w prawo
+				moveStraight(200, 3);
 				return;
 				
 			case 10: // lewo
-				stopMotor(10, 3);
-				//moveStraight(20, 3);
+				setTurn(oneWheel, .25, 3);
+				moveStraight(200, 3);
 				return;
 				
 			case 21: // prawo
-				stopMotor(10, 3);
-				//moveStraight(20, 3);
+				setTurn(oneWheel, -.25, 3);
+				moveStraight(200, 3);
 				return;
 		}
 	}
@@ -204,6 +200,19 @@ void setup(){
 	if(DEBUG) {
 		usart_init();
 	}
+	
+	setb(SERVO1_DDR, SERVO1_PIN);
+	setb(SERVO2_DDR, SERVO2_PIN);
+	clr(SERVO1_PORT, SERVO1_PIN);
+	clr(SERVO2_PORT, SERVO2_PIN);
+}
+
+void klapy(){
+	setb(SERVO1_PORT, SERVO1_PIN);
+	setb(SERVO2_PORT, SERVO2_PIN);
+	wait_ms(500);
+	clr(SERVO1_PORT, SERVO1_PIN);
+	clr(SERVO2_PORT, SERVO2_PIN);
 }
 
 unsigned char ticks = 0;
@@ -263,7 +272,7 @@ void loop(){
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
-		//if (pri == 0) led_set(ground);
+
 		char fProbe = 0;//getProbe(front);
 		char bProbe = 0;//getProbe(!front);
 		
@@ -300,9 +309,6 @@ void loop(){
 		//szukaj
 		motor[0].setPower(60);
 		motor[1].setPower(100);
-		/*
-		motor[0].stop();
-		motor[1].stop();*/
 	}	
 }
 
@@ -327,6 +333,7 @@ int main() {
 		default:
 		break;
 	}
+	klapy();
 	for(;;){
 		loop();
 		// unsigned char ground = getGround();
