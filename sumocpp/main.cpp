@@ -35,8 +35,8 @@ void fikumiku(){
 	
 	back = !back;
 	motor[0].reverse = motor[1].reverse = back;
-	//motor[0].setPower(0);
-	//motor[1].setPower(0);
+	motor[0].setPower(0);
+	motor[1].setPower(0);
 	q.clear();
 }
 
@@ -59,8 +59,8 @@ const char lightTurn = 2;
 
 Move turnPowers[] = {
 	{100, -100, 0, 1400/ITIME}, // obrot w prawo dookola prawego kola, lewy na 50% prawy na 0, czas=1000ms
-	{100, 0, 0, 2500/ITIME}, // jakis tam skret inny w prawo
-	{100, 60, 0, 4000/ITIME}
+	{100, 0, 0, 2300/ITIME}, // jakis tam skret inny w prawo
+	{100, 60, 0, 7000/ITIME}
 };
 
 void setTurn(char rad, float angle, char pri){
@@ -94,9 +94,10 @@ void unik(char pri){
 	}
 	
 	//jeden z silnikow sie zatrzyma, 2 pojedzie do tylu
-	//q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);
-	//fikumiku();*/
-	setTurn(0, 1, 3);
+	//q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);*/
+	//fikumiku();
+	moveStraight(20, 2);
+	setTurn(oneWheel, .5, 2);
 	//tu by sie moglo przydac wrzucanie fikumiku na kolejke?
 	led_set(0);
 }
@@ -307,13 +308,13 @@ void loop(){
 	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
-		unsigned char ground = 1;//getGround();
+		unsigned char ground = getGround();
 
 		fProbe = getProbe(back);
 		bProbe = getProbe(!back);
-		//led_set(fProbe|bProbe);
+		led_set(fProbe);
 		
-		if (ground!=1 || fProbe == koniecRingu || bProbe == koniecRingu){
+		if (ground!=1/* || fProbe == koniecRingu || bProbe == koniecRingu*/){
 			planEscape(ground, fProbe, bProbe);
 			pri = 3;
 		}
@@ -333,8 +334,8 @@ void loop(){
 			unik(2);
 			pri = 2;
 		}
-		//sprawdzam disty
-		/*
+		/*//sprawdzam disty
+		
 		char vals[][2] = {{0, 0}, {0, 0}};
 		vals[back][0] = getDistance(Dist[back][0], fProbe); 
 		//fProbe zawsze jest z przodu
@@ -371,8 +372,8 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(0);
-		motor[1].setPower(0);
+		motor[0].setPower(60);
+		motor[1].setPower(60);
 	}	
 }
 
@@ -381,7 +382,7 @@ int main() {
 	
 	led_set(1);
 	
-	//while(!preLoop()) wait_ms(ITIME);
+	while(!preLoop()) wait_ms(ITIME);
 	led_set(0);
 	
 	q.clear();

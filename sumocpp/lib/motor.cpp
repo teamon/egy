@@ -25,9 +25,10 @@ gdy potem leci fikumiku() to reverse == 0 i getPower() zwraca power = -p
 gdy potem dostane taki sam power tzn. -p to ponizsza implikacja spowoduje
 wyjscie z funkcji, czyli wszystko ok :)
 */	
+	//if (getPower()*p < 0) stop();
 	if (p == getPower()) return;
 	power = p;
-	if (power*p < 0) stop();
+	
 	char dir = p; /// albo p/abs(p);
 	p = abs(p);
 	// if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;	
