@@ -343,26 +343,31 @@ void loop(){
 		
 			vals[!back][0] = getDistance(Dist[!back][0], bProbe);
 			vals[!back][1] = getDistance(Dist[!back][0], bProbe);
+						
 		
 			bool side = back;
 			if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
 				side = !back;
 				fikumiku();
 			}
-		
-			char d = vals[side][0] - vals[side][1];
-		
+			
+			int d = vals[side][0] - vals[side][1];		
 			if (d == 0){
-				if (vals[side][0] != 100){
+			 	if(vals[side][0] != 100){
+					q.clear();
 					moveStraight(200, 1);
 				}
-			}else if(d > 0){
-				q.push(100, d*2.0/5, 200/ITIME, 1);
 			} else {
-				q.push(d*2.0/5, 100, 200/ITIME, 1);
+				q.clear();
+				// sa 4 opcje. 
+				// 1. tak jak jest
+				// 2. odwrotnie
+				// 3. tak jak jest, a dla back odwrotnie
+				// 4. odwrotnie, a dla back tak jak jest
+				if(d > 0) q.push(100, d*2.0/5, 200/ITIME, 1);
+				else q.push(d*2.0/5, 100, 200/ITIME, 1);
 			}
-	
-			//*/
+		
 			pri = 1;
 		}
 	}
