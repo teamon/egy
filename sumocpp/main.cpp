@@ -35,8 +35,8 @@ void fikumiku(){
 	
 	back = !back;
 	motor[0].reverse = motor[1].reverse = back;
-	motor[0].setPower(0);
-	motor[1].setPower(0);
+	//motor[0].setPower(0);
+	//motor[1].setPower(0);
 	q.clear();
 }
 
@@ -218,7 +218,7 @@ struct ValAndDist{
 	int val;
 };
 
-/*ValAndDist values[] = {
+ValAndDist values[] = {
 {10, 120},
 {15, 87},
 {20, 70},
@@ -247,7 +247,7 @@ char getDistance(int value, char probe){
 		}
 	}
 	return -1;
-}*/
+}
 
 unsigned char ticks = 0;
 bool odliczanie = false;

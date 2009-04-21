@@ -27,7 +27,7 @@ wyjscie z funkcji, czyli wszystko ok :)
 */	
 	if (p == getPower()) return;
 	power = p;
-
+	if (power*p < 0) stop();
 	char dir = p; /// albo p/abs(p);
 	p = abs(p);
 	// if(p > MOTOR_MAX_POWER) p = MOTOR_MAX_POWER;	
