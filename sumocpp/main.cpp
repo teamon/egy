@@ -76,8 +76,9 @@ void setTurn(char rad, float angle, char pri){
 }
 
 void unik(char pri){
-	return;
-	//zakladam ze zatrzymanie i zmiana kierunku to proces czasochlonny
+	led_set(255);
+	q.clear();
+	/*//zakladam ze zatrzymanie i zmiana kierunku to proces czasochlonny
 	//wiec daze do zachowania jak najmniejszej ilosci zatrzyman/zmian	
 	bool ktorym = 0;
 	int wyn = motor[0].getPower()*motor[1].getPower();
@@ -94,9 +95,10 @@ void unik(char pri){
 	
 	//jeden z silnikow sie zatrzyma, 2 pojedzie do tylu
 	//q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);
-	fikumiku();
-	setTurn(oneWheel, .75*((ktorym)?-1:1), 3);
+	//fikumiku();*/
+	setTurn(0, 1, 3);
 	//tu by sie moglo przydac wrzucanie fikumiku na kolejke?
+	led_set(0);
 }
 
 unsigned char getGround(){
@@ -108,15 +110,15 @@ unsigned char getGround(){
 	return out;
 }
  
+const char wZwarciu = 2;
+const char koniecRingu = 1;
 char getProbe(bool side){
-	if (!inrange(Dist[side][2], 110, 120)){ //zakres dla ringu
-		if ( Dist[side][2] < 110)
-		{ //nic nie ma z przodu więc kres
-			return 2; //zwarcie
-		}else{
-			return 1; //koniec ringu
-		}
+	if (Dist[side][2] < 90){
+			return wZwarciu; //zwarcie
+	}else if (Dist[side][2] > 130){
+			return koniecRingu; //koniec ringu
 	}
+	
 	return 0;
 }
  
@@ -218,7 +220,7 @@ struct ValAndDist{
 	int val;
 };
 
-ValAndDist values[] = {
+ValAndDist vnd[] = {
 {10, 120},
 {15, 87},
 {20, 70},
@@ -232,30 +234,28 @@ ValAndDist values[] = {
 const char valuesLen = 9;
 
 char getDistance(int value, char probe){
-	if (value < 30) return -1;
+	if (value < 30) return 100;
 	if (probe == 2) return 0;
 	
 	char n = valuesLen, left = 0;
 	for(;;){
 		int center = (left + n)/2;
-		if (values[center].val == value || n-left < 2){
-			return values[center].dist;
-		}else if (values[center].val < value){
+		if (vnd[center].val == value || n-left < 2){
+			return vnd[center].dist;
+		}else if (vnd[center].val < value){
 			n = center;
 		}else{
 			left = center;
 		}
 	}
-	return -1;
+	return 100;
 }
-
 unsigned char ticks = 0;
 bool odliczanie = false;
 bool hold = false, hold2 = false;
 char strategia = 0;
 int power = 1;
 bool preLoop(){
-	led_set(getGround());
 	if (DEBUG){
 		usart_write_byte(0);
 		if (usart_read_byte() == '!'){
@@ -263,7 +263,7 @@ bool preLoop(){
 			usart_write_progmem_string(PSTR("Bonjour\n"));
 			return true;
 		}
-	}//else {
+	}
 	if (switch1_pressed() && !hold){
 		odliczanie = !odliczanie;
 		ticks = 0;
@@ -286,12 +286,11 @@ bool preLoop(){
 	if (ticks >= WAIT/ITIME) return true;
 	if (odliczanie)
 		led_set(1<<(5-ticks*5*ITIME/WAIT));
-	//}
+
 	return false;
 }
 
 void loop(){
-	led_set(255*back);
 	kalmanize();
 	if(DEBUG){
 		debug();
@@ -301,7 +300,6 @@ void loop(){
 	int pri = 0;
 	if (!q.empty()){
 		pri = q.front()->pri;
-		//led_set(pri);
 	}
 	
 	char fProbe = 0;
@@ -309,33 +307,61 @@ void loop(){
 	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
-		unsigned char ground = getGround();
+		unsigned char ground = 1;//getGround();
 
-		fProbe = 0;//getProbe(back);
-		bProbe = 0;//getProbe(!back);
+		fProbe = getProbe(back);
+		bProbe = getProbe(!back);
+		//led_set(fProbe|bProbe);
 		
-		if (fProbe == 2 || bProbe == 2){
-			zwarcie = true;
-			zwarcieLen+=(zwarcieLen < 200);
-		}else{
-			zwarcieLen-=(zwarcieLen!=0);
-			zwarcie = false;
-		}
-		
-		if (ground!=1 || fProbe == 1 || bProbe == 1){
+		if (ground!=1 || fProbe == koniecRingu || bProbe == koniecRingu){
 			planEscape(ground, fProbe, bProbe);
 			pri = 3;
-		}else if (zwarcieLen>100 && zwarcie){ //maksymalna sensowna dl zwarcia
-			if (bProbe==2)
-				fikumiku();
- 
-			unik(2);
-			pri = 2;
 		}
 	}
 	if (pri < 2){
+		if (fProbe == wZwarciu || bProbe == wZwarciu){
+			zwarcie = true;
+			zwarcieLen+=1;
+		}else{
+			//zwarcieLen-=(zwarcieLen>0);
+			zwarcie = false;
+		}
+		if (zwarcieLen>=100 && zwarcie){ //maksymalna sensowna dl zwarcia
+			if (fProbe==wZwarciu)
+				fikumiku();
+			zwarcieLen = 0;
+			unik(2);
+			pri = 2;
+		}
 		//sprawdzam disty
+		/*
+		char vals[][2] = {{0, 0}, {0, 0}};
+		vals[back][0] = getDistance(Dist[back][0], fProbe); 
+		//fProbe zawsze jest z przodu
+		vals[back][1] = getDistance(Dist[back][1], fProbe);
 		
+		vals[!back][0] = getDistance(Dist[!back][0]), bProbe);
+		vals[!back][1] = getDistance(Dist[!back][0]), bProbe);
+		
+		bool side = back;
+		if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
+			side = !back;
+			fikumiku();
+		}
+		
+		char d = vals[side][0] - vals[side][1];
+		
+		if (d == 0){
+			if (vals[side][0] != 100){
+				setStraight(200, 1);
+			}
+		}else if(d > 0){
+			q.push(100, d*2.0/5, 200/ITIME, 1);
+		} else {
+			q.push(d*2.0/5, 100, 200/ITIME, 1);
+		}
+	
+		*/
 		pri = 1;
 	}
 	
@@ -345,8 +371,8 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(100);
-		motor[1].setPower(100);
+		motor[0].setPower(0);
+		motor[1].setPower(0);
 	}	
 }
 
@@ -355,7 +381,7 @@ int main() {
 	
 	led_set(1);
 	
-	while(!preLoop()) wait_ms(ITIME);
+	//while(!preLoop()) wait_ms(ITIME);
 	led_set(0);
 	
 	q.clear();
