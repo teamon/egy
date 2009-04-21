@@ -144,7 +144,7 @@ void planEscape(unsigned char grd, char fp, char bp){
 			case 35: // tyl
 			case 6: // przod
 				moveStraight(400, 3);
-				setTurn(oneWheel, .125, 2);
+				setTurn(oneWheel, .125, 1);
 				return;
 			
 			case 2: // przod lewy
