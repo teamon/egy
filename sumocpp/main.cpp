@@ -327,43 +327,45 @@ void loop(){
 			//zwarcieLen-=(zwarcieLen>0);
 			zwarcie = false;
 		}
+		
 		if (zwarcieLen>=100 && zwarcie){ //maksymalna sensowna dl zwarcia
 			if (fProbe==wZwarciu)
 				fikumiku();
 			zwarcieLen = 0;
 			unik(2);
 			pri = 2;
-		}
-		/*//sprawdzam disty
+		}else{
+			//sprawdzam disty
 		
-		char vals[][2] = {{0, 0}, {0, 0}};
-		vals[back][0] = getDistance(Dist[back][0], fProbe); 
-		//fProbe zawsze jest z przodu
-		vals[back][1] = getDistance(Dist[back][1], fProbe);
+			char vals[][2] = {{0, 0}, {0, 0}};
+			vals[back][0] = getDistance(Dist[back][0], fProbe); 
+			//fProbe zawsze jest z przodu
+			vals[back][1] = getDistance(Dist[back][1], fProbe);
 		
-		vals[!back][0] = getDistance(Dist[!back][0]), bProbe);
-		vals[!back][1] = getDistance(Dist[!back][0]), bProbe);
+			vals[!back][0] = getDistance(Dist[!back][0]), bProbe);
+			vals[!back][1] = getDistance(Dist[!back][0]), bProbe);
 		
-		bool side = back;
-		if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
-			side = !back;
-			fikumiku();
-		}
-		
-		char d = vals[side][0] - vals[side][1];
-		
-		if (d == 0){
-			if (vals[side][0] != 100){
-				setStraight(200, 1);
+			bool side = back;
+			if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
+				side = !back;
+				fikumiku();
 			}
-		}else if(d > 0){
-			q.push(100, d*2.0/5, 200/ITIME, 1);
-		} else {
-			q.push(d*2.0/5, 100, 200/ITIME, 1);
-		}
+		
+			char d = vals[side][0] - vals[side][1];
+		
+			if (d == 0){
+				if (vals[side][0] != 100){
+					setStraight(200, 1);
+				}
+			}else if(d > 0){
+				q.push(100, d*2.0/5, 200/ITIME, 1);
+			} else {
+				q.push(d*2.0/5, 100, 200/ITIME, 1);
+			}
 	
-		*/
-		pri = 1;
+			//*/
+			pri = 1;
+		}
 	}
 	
 	if (!q.empty()){
