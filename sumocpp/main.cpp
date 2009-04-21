@@ -312,7 +312,6 @@ void loop(){
 
 		fProbe = getProbe(back);
 		bProbe = getProbe(!back);
-		led_set(fProbe);
 		
 		if (ground!=1/* || fProbe == koniecRingu || bProbe == koniecRingu*/){
 			planEscape(ground, fProbe, bProbe);
@@ -342,8 +341,8 @@ void loop(){
 			//fProbe zawsze jest z przodu
 			vals[back][1] = getDistance(Dist[back][1], fProbe);
 		
-			vals[!back][0] = getDistance(Dist[!back][0]), bProbe);
-			vals[!back][1] = getDistance(Dist[!back][0]), bProbe);
+			vals[!back][0] = getDistance(Dist[!back][0], bProbe);
+			vals[!back][1] = getDistance(Dist[!back][0], bProbe);
 		
 			bool side = back;
 			if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
@@ -355,7 +354,7 @@ void loop(){
 		
 			if (d == 0){
 				if (vals[side][0] != 100){
-					setStraight(200, 1);
+					moveStraight(200, 1);
 				}
 			}else if(d > 0){
 				q.push(100, d*2.0/5, 200/ITIME, 1);
@@ -374,8 +373,8 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(60);
-		motor[1].setPower(60);
+		motor[0].setPower(100);
+		motor[1].setPower(100);
 	}	
 }
 
