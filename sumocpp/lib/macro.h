@@ -4,6 +4,7 @@
 #define mabs(x) ((x<0)?-(x):x)
 #define inrange(x, from, to) (x>=from && x<=to)
 #define min(x, y) ((x<=y)?x:y)
+#define max(x, y) ((x>=y)?x:y)
 // Ustawia bit w bajcie
 #define setb(byte,bit) byte |= (1 << bit)
 // Zeruje bit w bajcie

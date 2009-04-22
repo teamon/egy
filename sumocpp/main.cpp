@@ -21,11 +21,12 @@
 #define ITIME 20
 #define DEBUG 0
 #define WAIT 1000
+#define ZWARCIE 100
 
 Queue q;
 bool back = 0;
 bool zwarcie = 0;
-unsigned char zwarcieLen = 0;
+int zwarcieLen = 0;
 
 void fikumiku(){
 	//motory, disty, groundy
@@ -75,8 +76,7 @@ void setTurn(char rad, float angle, char pri){
 	q.push(m);
 }
 
-void unik(char pri){
-	led_set(255);
+void unik(char pri, bool side){
 	q.clear();
 	/*//zakladam ze zatrzymanie i zmiana kierunku to proces czasochlonny
 	//wiec daze do zachowania jak najmniejszej ilosci zatrzyman/zmian	
@@ -96,10 +96,9 @@ void unik(char pri){
 	//jeden z silnikow sie zatrzyma, 2 pojedzie do tylu
 	//q.push(-(ktorym!=0)*100, -(ktorym!=1)*100, 20, pri);*/
 	//fikumiku();
-	moveStraight(20, 2);
-	setTurn(oneWheel, .5, 2);
+	moveStraight(80, pri);
+	setTurn(oneWheel, ((side)?1:-1)*.75, pri);
 	//tu by sie moglo przydac wrzucanie fikumiku na kolejke?
-	led_set(0);
 }
 
 unsigned char getGround(){
@@ -124,14 +123,13 @@ char getProbe(bool side){
 }
  
 void planEscape(unsigned char grd, char fp, char bp){
-	//led_set(grd);
 	q.clear();
 	if (grd == 1){
-		if (fp==1)
+		if (fp==koniecRingu)
 			fikumiku();
 		
 		if (zwarcie)
-			unik(3);
+			unik(3, 1);
 		else
 			moveStraight(20, 3);
 	}else{
@@ -140,33 +138,44 @@ void planEscape(unsigned char grd, char fp, char bp){
 		(grd%5==0 || grd%7==0) && back)){
 			fikumiku();
 		}
+		
+		/*if (zwarcieLen >= ZWARCIE && (((grd%2==0 || grd%3==0) && back) || 
+		((grd%5==0 || grd%7==0) && !back))){
+			//fikumiku();
+			zwarcieLen = 0;
+			q.push(100, -100, 300, 3);
+			return;
+		}*/
+		
 		switch(grd){
 			case 35: // tyl
 			case 6: // przod
 				moveStraight(400, 3);
-				setTurn(oneWheel, .125, 1);
+				setTurn(oneWheel, .125, 3);
 				return;
 			
 			case 2: // przod lewy
 			case 5: // tyl lewy
+			moveStraight(200, 3);
 				setTurn(lightTurn, ((back)?-1:1)*.125, 3); // skret o 45 stopni w prawo
-				moveStraight(200, 3);
 				return;
 			
 			case 3: // przod prawy
 			case 7: // tyl prawy
-				setTurn(lightTurn, ((!back)?-1:1)*.125, 3); // skret o 45 stopni w prawo
 				moveStraight(200, 3);
+				setTurn(lightTurn, ((!back)?-1:1)*.125, 3); // skret o 45 stopni w prawo
 				return;
 				
 			case 15: // lewo
+			moveStraight(200, 3);
 				setTurn(lightTurn, ((back)?-1:1)*.25, 3);
-				moveStraight(200, 3);
+			
 				return;
 				
 			case 14: // prawo
-				setTurn(lightTurn, ((!back)?-1:1)*.25, 3);
 				moveStraight(200, 3);
+				setTurn(lightTurn, ((!back)?-1:1)*.25, 3);
+
 				return;
 		}
 	}
@@ -242,6 +251,8 @@ char getDistance(int value, char probe){
 	for(;;){
 		int center = (left + n)/2;
 		if (vnd[center].val == value || n-left < 2){
+			if (vnd[center].dist > 20)
+				return 100;
 			return vnd[center].dist;
 		}else if (vnd[center].val < value){
 			n = center;
@@ -292,6 +303,7 @@ bool preLoop(){
 }
 
 void loop(){
+	led_set(zwarcieLen>=ZWARCIE);
 	kalmanize();
 	if(DEBUG){
 		debug();
@@ -303,15 +315,14 @@ void loop(){
 		pri = q.front()->pri;
 	}
 	
-	char fProbe = 0;
-	char bProbe = 0;
+	char fProbe = getProbe(back);
+	char bProbe = getProbe(!back);
 	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
-
-		fProbe = getProbe(back);
-		bProbe = getProbe(!back);
+		//fProbe = ;
+		//bProbe = getProbe(!back);
 		
 		if (ground!=1/* || fProbe == koniecRingu || bProbe == koniecRingu*/){
 			planEscape(ground, fProbe, bProbe);
@@ -321,29 +332,29 @@ void loop(){
 	if (pri < 2){
 		if (fProbe == wZwarciu || bProbe == wZwarciu){
 			zwarcie = true;
-			zwarcieLen+=1;
+			zwarcieLen+=(zwarcieLen <= ZWARCIE);
 		}else{
-			//zwarcieLen-=(zwarcieLen>0);
+			// zwarcieLen = 0;
 			zwarcie = false;
 		}
 		
-		if (zwarcieLen>=100 && zwarcie){ //maksymalna sensowna dl zwarcia
+		if (zwarcieLen>=ZWARCIE && zwarcie){ //maksymalna sensowna dl zwarcia
 			if (fProbe==wZwarciu)
 				fikumiku();
 			zwarcieLen = 0;
-			unik(2);
+			unik(2, 0);
 			pri = 2;
 		}else{
 			//sprawdzam disty
 		
 			char vals[][2] = {{0, 0}, {0, 0}};
+
 			vals[back][0] = getDistance(Dist[back][0], fProbe); 
 			//fProbe zawsze jest z przodu
 			vals[back][1] = getDistance(Dist[back][1], fProbe);
 		
 			vals[!back][0] = getDistance(Dist[!back][0], bProbe);
 			vals[!back][1] = getDistance(Dist[!back][0], bProbe);
-						
 		
 			bool side = back;
 			if (min(vals[back][0], vals[back][1]) > min(vals[!back][0], vals[!back][1])){
@@ -359,13 +370,8 @@ void loop(){
 				}
 			} else {
 				q.clear();
-				// sa 4 opcje. 
-				// 1. tak jak jest
-				// 2. odwrotnie
-				// 3. tak jak jest, a dla back odwrotnie
-				// 4. odwrotnie, a dla back tak jak jest
-				if(d > 0) q.push(100, d*2.0/5, 200/ITIME, 1);
-				else q.push(d*2.0/5, 100, 200/ITIME, 1);
+				if(d < 0) q.push(100, max(100 - mabs(d)*.0/5, 50), 200/ITIME, 1);
+				else q.push(max(100 - mabs(d)*4.0/5, 50), 100, 200/ITIME, 1);
 			}
 		
 			pri = 1;

@@ -9,6 +9,8 @@ Motor::Motor(volatile uint16_t* reg, volatile uint8_t* port, unsigned char pin){
 	DIR_PIN = pin;
 	reverse = false;
 	power = 0;
+	*REG = 0;
+	clr(*DIR_PORT, DIR_PIN);
 }
 
 void Motor::stop(){
