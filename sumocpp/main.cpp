@@ -127,7 +127,7 @@ void planEscape(unsigned char grd, char fp, char bp){
 	//led_set(grd);
 	q.clear();
 	if (grd == 1){
-		if (bp==1)
+		if (fp==1)
 			fikumiku();
 		
 		if (zwarcie)
@@ -378,8 +378,8 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(100);
-		motor[1].setPower(100);
+		motor[0].setPower(0);
+		motor[1].setPower(0);
 	}	
 }
 
@@ -395,8 +395,8 @@ int main() {
 	
 	switch (strategia){
 		case 1:
-			motor[0].setPower(50);
-			motor[1].setPower(50);
+			// motor[0].setPower(50);
+			// motor[1].setPower(50);
 		break;
 		case 2:
 		
