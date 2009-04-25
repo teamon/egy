@@ -20,7 +20,7 @@
 
 #define ITIME 20
 #define DEBUG 0
-#define WAIT 1000
+#define WAIT 4500
 #define ZWARCIE 100
 
 Queue q;
@@ -115,7 +115,7 @@ const char koniecRingu = 1;
 char getProbe(bool side){
 	if (Dist[side][2] < 90){
 			return wZwarciu; //zwarcie
-	}else if (Dist[side][2] > 130){
+	}else if (Dist[side][2] > 140){
 			return koniecRingu; //koniec ringu
 	}
 	
@@ -126,12 +126,10 @@ void planEscape(unsigned char grd, char fp, char bp){
 	q.clear();
 	if (grd == 1){
 		if (fp==koniecRingu)
-			fikumiku();
-		
-		if (zwarcie)
-			unik(3, 1);
-		else
-			moveStraight(20, 3);
+			fikumiku();		
+		//led_set(255);
+		moveStraight(300, 3);
+		//led_set(0);
 	}else{
 		if (grd!=14 && grd!=15 && 
 		((grd%2==0 || grd%3==0) && !back || 
@@ -303,7 +301,6 @@ bool preLoop(){
 }
 
 void loop(){
-	led_set(zwarcieLen>=ZWARCIE);
 	kalmanize();
 	if(DEBUG){
 		debug();
@@ -315,36 +312,39 @@ void loop(){
 		pri = q.front()->pri;
 	}
 	
-	char fProbe = getProbe(back);
-	char bProbe = getProbe(!back);
+	char fProbe = 0;
+	char bProbe = 0;
 	
 	if (pri < 3){
 		//sprawdzam disty 3 i 6 i grd
 		unsigned char ground = getGround();
-		//fProbe = ;
-		//bProbe = getProbe(!back);
+		led_set(ground);
+		fProbe = getProbe(back);
+		bProbe = getProbe(!back);
 		
-		if (ground!=1/* || fProbe == koniecRingu || bProbe == koniecRingu*/){
+		if (ground!=1 || fProbe == koniecRingu || bProbe == koniecRingu){
 			planEscape(ground, fProbe, bProbe);
 			pri = 3;
 		}
 	}
 	if (pri < 2){
-		if (fProbe == wZwarciu || bProbe == wZwarciu){
+		//fProbe = getProbe(back);
+		//bProbe = getProbe(!back);
+		/*if (fProbe == wZwarciu || bProbe == wZwarciu){
 			zwarcie = true;
 			zwarcieLen+=(zwarcieLen <= ZWARCIE);
 		}else{
 			// zwarcieLen = 0;
 			zwarcie = false;
-		}
+		}*/
 		
-		if (zwarcieLen>=ZWARCIE && zwarcie){ //maksymalna sensowna dl zwarcia
-			if (fProbe==wZwarciu)
+		///*if (/*zwarcieLen>=ZWARCIE && zwarcie*/0){ //maksymalna sensowna dl zwarcia
+			/*if (fProbe==wZwarciu)
 				fikumiku();
 			zwarcieLen = 0;
 			unik(2, 0);
 			pri = 2;
-		}else{
+		}else{*/
 			//sprawdzam disty
 		
 			char vals[][2] = {{0, 0}, {0, 0}};
@@ -375,7 +375,7 @@ void loop(){
 			}
 		
 			pri = 1;
-		}
+		//}
 	}
 	
 	if (!q.empty()){
@@ -384,8 +384,8 @@ void loop(){
 		q.dec(1);
 	}else{
 		//szukaj
-		motor[0].setPower(0);
-		motor[1].setPower(0);
+		motor[0].setPower(100);
+		motor[1].setPower(60);
 	}	
 }
 
@@ -401,8 +401,9 @@ int main() {
 	
 	switch (strategia){
 		case 1:
-			// motor[0].setPower(50);
-			// motor[1].setPower(50);
+			motor[0].setPower(100);
+			motor[1].setPower(100);
+			moveStraight(200, 2);
 		break;
 		case 2:
 		
